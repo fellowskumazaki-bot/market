@@ -76,6 +76,7 @@
   .chips .n { color: var(--muted); margin-right: 4px; }
   .nd-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
   .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .switch .pill { font-size: 14px; padding: 4px 14px; }
   .nd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 20px; }
   .nd-col { display: grid; gap: 12px; align-content: start; min-width: 0; }
   .nd-head { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
@@ -125,7 +126,10 @@
   <section class="tiles" id="tiles" aria-label="主な指標"></section>
 
   <section class="section" id="portfolio">
-    <h2>ポートフォリオ</h2>
+    <div class="nd-top">
+      <h2>ポートフォリオ</h2>
+      <div class="filters switch" role="group" aria-label="表示する銘柄" id="stock-switch"></div>
+    </div>
     <div class="card" id="portfolio-news">
       <div class="nd-top">
         <h3>保有銘柄のニュース</h3>
@@ -216,7 +220,28 @@
 
   var CATS = [['世界情勢', 'var(--warn)'], ['決算', 'var(--accent)'], ['株価の動き', 'var(--bar-muted)'], ['配当', 'var(--up)'],
     ['業界・競合', 'var(--accent2)'], ['提携・事業', 'var(--accent3)'], ['リスク', 'var(--down)']];
-  var state = { cat: '', market: null, watch: null };
+  var state = { cat: '', code: '', market: null, watch: null };
+  function codeFromHash() { var m = String(location.hash).match(/^#c(\w+)$/); return m ? m[1] : ''; }
+  state.code = codeFromHash();
+  function picked(rows) { return state.code ? rows.filter(function (r) { return r.code === state.code; }) : rows; }
+  function shortName(n) { return String(n).replace(/（.*?）/g, ''); }
+  function renderSwitch(w) {
+    var box = clear(document.getElementById('stock-switch'));
+    if (!w) return;
+    var list = w.watch || [];
+    if (state.code && !list.some(function (r) { return r.code === state.code; })) state.code = '';
+    [{ code: '', name: 'すべての銘柄' }].concat(list).forEach(function (r) {
+      var b = el('button', 'pill', shortName(r.name)); b.type = 'button';
+      b.setAttribute('aria-pressed', String(state.code === r.code));
+      b.addEventListener('click', function () {
+        state.code = r.code;
+        if (history.replaceState) history.replaceState(null, '', r.code ? '#c' + r.code : location.pathname + location.search);
+        renderSwitch(state.watch); renderNewsdesk(state.watch); renderStocks(state.watch);
+      });
+      box.appendChild(b);
+    });
+  }
+  window.addEventListener('hashchange', function () { state.code = codeFromHash(); renderSwitch(state.watch); renderNewsdesk(state.watch); renderStocks(state.watch); });
   try { state.cat = localStorage.getItem('mk-cat') || ''; } catch (e) {}
 
   function table(target, cols, rows) {
@@ -293,7 +318,7 @@
   function renderNewsdesk(w) {
     var box = clear(document.getElementById('newsdesk'));
     if (!w) return;
-    (w.watch || []).forEach(function (r) {
+    picked(w.watch || []).forEach(function (r) {
       var col = el('div', 'nd-col');
       var head = el('div', 'nd-head');
       head.appendChild(el('h4', '', r.name));
@@ -343,7 +368,7 @@
   function renderStocks(w) {
     var box = clear(document.getElementById('stocks'));
     if (!w) return;
-    (w.watch || []).forEach(function (r) {
+    picked(w.watch || []).forEach(function (r) {
       var card = el('article', 'card'); card.id = 'stock-' + r.code;
       var head = el('div', 'nd-head');
       head.appendChild(el('h3', '', r.name)); head.appendChild(el('span', 'sub', r.code));
@@ -448,7 +473,7 @@
   function render() {
     var m = state.market, w = state.watch;
     if (m) { renderHeader(m); renderTiles(m); renderFutures(m); renderRest(m); }
-    renderFilters(); renderNewsdesk(w); renderStocks(w);
+    renderSwitch(w); renderFilters(); renderNewsdesk(w); renderStocks(w);
   }
 
   function getJSON(path) {
