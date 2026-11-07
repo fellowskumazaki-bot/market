@@ -324,11 +324,15 @@
  "breadth": [
   {
    "side": "値上がり",
-   "companies": 213
+   "companies": 21,
+   "market": "東証プライム",
+   "url": "https://finance.yahoo.co.jp/stocks/ranking/up?market=tokyo1"
   },
   {
    "side": "値下がり",
-   "companies": 4053
+   "companies": 1524,
+   "market": "東証プライム",
+   "url": "https://finance.yahoo.co.jp/stocks/ranking/down?market=tokyo1"
   }
  ],
  "topics": [
