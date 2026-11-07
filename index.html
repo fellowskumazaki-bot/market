@@ -76,6 +76,30 @@
   .chips .n { color: var(--muted); margin-right: 4px; }
   .nd-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
   .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mv-list { margin: 0; padding: 0; list-style: none; display: grid; }
+  .mv-row { display: grid; grid-template-columns: 1.6rem minmax(0, 1.6fr) 5.5rem minmax(6rem, 1fr) 9.5rem auto; gap: 4px 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .mv-row:last-child { border-bottom: 0; }
+  .mv-rank { font-family: var(--serif); font-size: 18px; color: var(--muted); text-align: right; }
+  .mv-name { display: grid; min-width: 0; }
+  .mv-name a { font-weight: 600; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mv-name a:hover { text-decoration: underline; }
+  .mv-name .sub { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .mine { font-size: 11px; border: 1px solid var(--accent); color: var(--accent); border-radius: 999px; padding: 0 6px; cursor: pointer; background: none; }
+  .mv-price { text-align: right; }
+  .mv-pct { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 6px; align-items: center; font-weight: 600; font-size: 14px; }
+  .mv-pct .track { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .mv-pct .track span { display: block; height: 100%; border-radius: 999px; }
+  .mv-vol { text-align: right; color: var(--muted); font-size: 12px; }
+  .mv-links { display: flex; gap: 4px; }
+  .mini { font-size: 12px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; text-decoration: none; white-space: nowrap; }
+  .mini:hover { border-color: var(--fg); }
+  @media (max-width: 780px) {
+    .mv-row { grid-template-columns: 1.4rem minmax(0, 1fr) auto; }
+    .mv-price { grid-column: 3; grid-row: 1; }
+    .mv-pct { grid-column: 2 / 4; }
+    .mv-vol { grid-column: 2; text-align: left; }
+    .mv-links { grid-column: 2 / 4; }
+  }
   .finder { gap: 8px; }
   .finder-lab { font-weight: 600; font-size: 15px; }
   .finder-row { display: flex; gap: 8px; }
@@ -220,6 +244,18 @@
   <div id="error" class="msg err" hidden></div>
 
   <section class="tiles" id="tiles" aria-label="主な指標"></section>
+
+  <section class="section" id="movers" hidden>
+    <div class="nd-top">
+      <h2>動きのいい銘柄</h2>
+      <div class="filters" role="group" aria-label="ランキングの種類" id="mv-tabs"></div>
+    </div>
+    <div class="card">
+      <p class="note" id="mv-note"></p>
+      <ol class="mv-list" id="mv-list"></ol>
+      <div id="mv-src"></div>
+    </div>
+  </section>
 
   <section class="section" id="portfolio">
     <h2>ポートフォリオ</h2>
@@ -849,9 +885,55 @@
       { label: '値', f: 'value', r: 1, fmt: function (v, row) { return row.unit === '%' ? pct(v) : num(v); } }, { label: '単位', f: 'unit', dim: 1 }], m.funds || []);
   }
 
+  // 動きのいい銘柄：各サイトのランキングから集めたもの
+  var mvKey = 'up';
+  try { mvKey = localStorage.getItem('mk-mv') || 'up'; } catch (e) {}
+  function renderMovers(m) {
+    var sec = document.getElementById('movers');
+    var mv = m && m.movers;
+    if (!mv) { sec.hidden = true; return; }
+    sec.hidden = false;
+    var keys = Object.keys(mv);
+    if (keys.indexOf(mvKey) < 0) mvKey = keys[0];
+    var tabs = clear(document.getElementById('mv-tabs'));
+    keys.forEach(function (k) {
+      var b = el('button', 'pill', mv[k].label); b.type = 'button'; b.setAttribute('aria-pressed', String(k === mvKey));
+      b.addEventListener('click', function () { mvKey = k; try { localStorage.setItem('mk-mv', k); } catch (e) {} renderMovers(state.market); });
+      tabs.appendChild(b);
+    });
+    var cur = mv[mvKey];
+    document.getElementById('mv-note').textContent = cur.note || '';
+    var mine = {}; ((state.watch && state.watch.watch) || []).forEach(function (r) { mine[r.code] = true; });
+    var rows = cur.rows || [];
+    var mx = Math.max.apply(null, rows.map(function (r) { return Math.abs(r.pct || 0); }).concat([1]));
+    var list = clear(document.getElementById('mv-list'));
+    rows.forEach(function (r) {
+      var li = el('li', 'mv-row');
+      li.appendChild(el('span', 'mv-rank', r.rank));
+      var nm = el('span', 'mv-name');
+      var a = el('a', '', r.name); a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; nm.appendChild(a);
+      var sub = el('span', 'sub'); sub.appendChild(document.createTextNode(r.code + '・' + (r.market || '')));
+      if (mine[r.code]) { var mb = el('button', 'mine', 'ポートフォリオ'); mb.type = 'button'; mb.addEventListener('click', function () { pick(r.code); document.getElementById('portfolio').scrollIntoView(); }); sub.appendChild(mb); }
+      nm.appendChild(sub); li.appendChild(nm);
+      li.appendChild(el('span', 'mv-price', r.price == null ? '—' : num(r.price) + ' 円'));
+      var p = el('span', 'mv-pct'); p.appendChild(tone(el('span', '', pct(r.pct)), r.pct));
+      var tr = el('span', 'track'); var s = el('span'); s.style.width = (Math.abs(r.pct || 0) / mx * 100) + '%'; s.style.background = r.pct < 0 ? 'var(--down)' : 'var(--up)'; tr.appendChild(s); p.appendChild(tr);
+      li.appendChild(p);
+      li.appendChild(el('span', 'mv-vol', r.volume == null ? '' : '出来高 ' + num(r.volume) + ' 株'));
+      var lk = el('span', 'mv-links');
+      [['Yahoo!', r.url], ['みんかぶ', 'https://minkabu.jp/stock/' + r.code], ['株探', 'https://kabutan.jp/stock/?code=' + r.code]].forEach(function (x) {
+        var b = el('a', 'mini', x[0]); b.href = x[1]; b.target = '_blank'; b.rel = 'noopener noreferrer'; lk.appendChild(b);
+      });
+      li.appendChild(lk);
+      list.appendChild(li);
+    });
+    var src = clear(document.getElementById('mv-src'));
+    src.appendChild(srcLine(cur.site, null, cur.url, null, '出典', 'ランキングを開く'));
+  }
+
   function render() {
     var m = state.market, w = state.watch;
-    if (m) { renderHeader(m); renderTiles(m); renderFutures(m); renderRest(m); }
+    if (m) { renderHeader(m); renderTiles(m); renderMovers(m); renderFutures(m); renderRest(m); }
     renderFilters(); renderPortfolio();
   }
 
