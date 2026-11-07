@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="マーケット朝刊">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161a" media="(prefers-color-scheme: dark)">
+<title>マーケット朝刊</title>
+<style>
+  /* Layout: one column of sections; cards in auto-fit grids that stack at phone width. */
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --fg: #1b1e24; --muted: #646b78; --line: #e2e5ea;
+    --up: #0f7b4a; --down: #c2362b; --warn: #b26a00; --accent: #2f5bd3; --accent2: #7a4fd1; --accent3: #0f8a8a;
+    --bar: #2f5bd3; --bar-muted: #b9c1cf;
+    --sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    --serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+    --r: 10px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14161a; --panel: #1c1f25; --fg: #e9ebef; --muted: #9aa1ad; --line: #2c3038;
+      --up: #3fbf83; --down: #f0675b; --warn: #e2a33b; --accent: #7b9dff; --accent2: #b391ff; --accent3: #4cc7c7;
+      --bar: #7b9dff; --bar-muted: #4a5160; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.6;
+    font-variant-numeric: tabular-nums; -webkit-text-size-adjust: 100%; }
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 28px;
+    padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(32px, env(safe-area-inset-bottom));
+    padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  h1 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 30px; line-height: 1.25; }
+  h2 { margin: 0; font-size: 18px; font-weight: 600; }
+  h3 { margin: 0; font-size: 16px; font-weight: 600; }
+  h4 { margin: 0; font-size: 15px; font-weight: 600; }
+  a { color: inherit; }
+  .head { display: grid; gap: 6px; }
+  .lede { margin: 0; max-width: 46rem; }
+  .lede b { font-weight: 600; }
+  .stamp-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
+  .stamp { margin: 0; color: var(--muted); font-size: 13px; }
+  button { font: inherit; }
+  .btn { border: 1px solid var(--fg); background: var(--fg); color: var(--bg); border-radius: 999px; padding: 6px 16px; cursor: pointer; font-size: 14px; }
+  .btn:disabled { opacity: .5; cursor: progress; }
+  .pill { border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 999px; padding: 2px 10px; cursor: pointer; font-size: 13px; }
+  .pill[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .btn:focus-visible, .pill:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .section { display: grid; gap: 12px; }
+  .note { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: 12px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 16px; display: grid; gap: 2px; min-width: 0; }
+  .tile .lab { font-weight: 600; font-size: 14px; }
+  .tile .when { color: var(--muted); font-size: 12px; }
+  .big { font-family: var(--serif); font-size: 26px; line-height: 1.25; }
+  .chg { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+  .up { color: var(--up); } .down { color: var(--down); }
+  .badge { font-size: 12px; border: 1px solid currentColor; border-radius: 999px; padding: 0 8px; white-space: nowrap; }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-weight: 600; font-size: 12px; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  .r { text-align: right; white-space: nowrap; }
+  .dim { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .list li { display: grid; gap: 1px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .list li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .sub { color: var(--muted); font-size: 12px; }
+  .chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips li { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 13px; }
+  .chips .n { color: var(--muted); margin-right: 4px; }
+  .nd-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .nd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 20px; }
+  .nd-col { display: grid; gap: 12px; align-content: start; min-width: 0; }
+  .nd-head { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .grp { display: grid; gap: 4px; }
+  .grp-lab { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .point { margin: 0; }
+  .heads { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+  .heads li { font-size: 13px; line-height: 1.5; }
+  .heads a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+  .heads .meta { color: var(--muted); white-space: nowrap; margin-left: 6px; }
+  .flag { color: var(--down); font-weight: 600; margin-right: 6px; white-space: nowrap; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 8px 14px; margin: 0; }
+  .stats div { display: grid; min-width: 0; }
+  .stats dt { color: var(--muted); font-size: 12px; }
+  .stats dd { margin: 0; overflow-wrap: anywhere; }
+  .subhead { margin: 0; padding-top: 6px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 600; }
+  .price-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+  .pts { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+  .chart { position: relative; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+  .chart .nm, .chart .end { fill: var(--fg); }
+  .chart .end { font-weight: 600; }
+  .breadth { display: flex; flex-wrap: wrap; gap: 16px; }
+  .msg { padding: 12px 16px; border-radius: var(--r); border: 1px solid var(--line); background: var(--panel); }
+  .msg.err { border-color: var(--down); }
+  details { color: var(--muted); font-size: 13px; }
+  details summary { cursor: pointer; }
+  details dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 8px 0 0; }
+  details dd { margin: 0; }
+  @media (max-width: 520px) { h1 { font-size: 25px; } .big { font-size: 22px; } details dl { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head" id="summary">
+    <h1>マーケット朝刊</h1>
+    <p class="lede" id="lede">読み込み中…</p>
+    <div class="stamp-row">
+      <p class="stamp">最終更新 <span id="stamp">—</span>（日本時間）・平日8時／12時／16時に自動更新・出典 Yahoo!ファイナンス／日経225先物リアルタイム／みんかぶ</p>
+      <button type="button" class="btn" id="reload">最新の情報に更新</button>
+    </div>
+  </header>
+  <div id="error" class="msg err" hidden></div>
+
+  <section class="tiles" id="tiles" aria-label="主な指標"></section>
+
+  <section class="section" id="portfolio">
+    <h2>ポートフォリオ</h2>
+    <div class="card" id="portfolio-news">
+      <div class="nd-top">
+        <h3>保有銘柄のニュース</h3>
+        <div class="filters" role="group" aria-label="ニュースの種類" id="filters"></div>
+      </div>
+      <p class="note">各項目の文章はClaudeの要約、下の見出しはYahoo!ファイナンスの銘柄ニュースです。見出しを押すと記事が開きます。<span class="flag">重要</span>は株価に大きく関わる記事です。</p>
+      <div class="nd-grid" id="newsdesk"></div>
+    </div>
+    <p class="note">株価は東証の終値、夜間PTSはその後の値です。</p>
+    <div class="grid" id="stocks"></div>
+  </section>
+
+  <section class="section" id="futures">
+    <h2>日経225先物</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>日経平均の終値との差</h3>
+        <p class="note">各市場の225先物が、前営業日の日経平均終値より何円高いか（円）。</p>
+        <div class="chart" id="fut-chart"></div>
+      </div>
+      <div class="card">
+        <h3>市場別の先物価格</h3>
+        <p class="note">前日比は各市場それぞれの前日終値との比較です。</p>
+        <div class="scroll"><table id="fut-table"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="world">
+    <h2>世界の指数・為替・商品</h2>
+    <div class="card"><div class="scroll"><table id="world-table"></table></div></div>
+  </section>
+
+  <section class="section" id="rankings">
+    <h2>日本株ランキング（前営業日）</h2>
+    <div class="breadth" id="breadth"></div>
+    <div class="grid">
+      <div class="card"><h3>値上がり率 上位</h3><table id="gainers"></table></div>
+      <div class="card"><h3>値下がり率 上位</h3><table id="losers"></table></div>
+    </div>
+  </section>
+
+  <section class="section" id="news">
+    <h2>今日の材料</h2>
+    <div class="grid">
+      <div class="card"><h3>マーケットAIトピックス</h3><p class="note">Yahoo!ファイナンスが自動でまとめた話題と影響銘柄。</p><ol class="list" id="topics"></ol></div>
+      <div class="card"><h3>ヘッドライン</h3><ul class="list" id="headlines"></ul></div>
+    </div>
+    <div class="grid">
+      <div class="card"><h3>人気テーマ</h3><p class="note">みんかぶで注目されている投資テーマの順位。</p><ol class="chips" id="themes"></ol></div>
+      <div class="card"><h3>今後の予定</h3><ul class="list" id="events"></ul></div>
+    </div>
+  </section>
+
+  <section class="section" id="funds">
+    <h2>投資信託ランキング</h2>
+    <div class="card">
+      <p class="note">Yahoo!ファイナンスの投資信託ランキング上位。NISAつみたて枠は資金流入額、純資産残高は残高（どちらも百万円）、トータルリターンは過去1年の騰落率です。</p>
+      <div class="scroll"><table id="funds-table"></table></div>
+    </div>
+  </section>
+
+  <details>
+    <summary>この朝刊について</summary>
+    <dl>
+      <dt>出典</dt><dd>Yahoo!ファイナンス、日経225先物リアルタイム、みんかぶに表示されていた内容を、Claudeが平日8時・12時・16時に読み込んでまとめています。</dd>
+      <dt>指数比</dt><dd>先物価格から前営業日の日経平均終値を引いた差です。</dd>
+      <dt>要約</dt><dd>「保有銘柄のニュース」の文章と会社の事業内容はClaudeが各サイトの内容を要約したものです。</dd>
+      <dt>ご注意</dt><dd>個人用のまとめで、売買を勧めるものではありません。みんかぶの情報は利用規約により再配布が禁止されているため、このページのリンクは人に送らないでください。</dd>
+    </dl>
+  </details>
+</div>
+
+<script>
+(function () {
+  var nf = new Intl.NumberFormat('ja-JP', { maximumFractionDigits: 4 });
+  function num(v) { return v === null || v === undefined || v === '' ? '—' : nf.format(v); }
+  function sgn(v) { return v === null || v === undefined ? '—' : (v > 0 ? '+' : '') + nf.format(v); }
+  function pct(v) { return v === null || v === undefined ? '—' : (v > 0 ? '+' : '') + Number(v).toFixed(2) + '%'; }
+  function tone(el, v) { if (typeof v === 'number') { if (v > 0) el.classList.add('up'); if (v < 0) el.classList.add('down'); } return el; }
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined && text !== null) n.textContent = text; return n; }
+  function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); return n; }
+  function byName(rows, name) { for (var i = 0; i < rows.length; i++) if (rows[i].name === name) return rows[i]; return null; }
+  function shortDate(s) {
+    var m = String(s || '').match(/^\d{4}-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);
+    return m ? Number(m[1]) + '/' + Number(m[2]) + (m[3] ? ' ' + Number(m[3]) + ':' + m[4] : '') : String(s || '');
+  }
+
+  var CATS = [['世界情勢', 'var(--warn)'], ['決算', 'var(--accent)'], ['株価の動き', 'var(--bar-muted)'], ['配当', 'var(--up)'],
+    ['業界・競合', 'var(--accent2)'], ['提携・事業', 'var(--accent3)'], ['リスク', 'var(--down)']];
+  var state = { cat: '', market: null, watch: null };
+  try { state.cat = localStorage.getItem('mk-cat') || ''; } catch (e) {}
+
+  function table(target, cols, rows) {
+    var t = clear(document.getElementById(target));
+    var thead = el('thead'); var tr = el('tr');
+    cols.forEach(function (c) { var th = el('th', c.r ? 'r' : '', c.label); tr.appendChild(th); });
+    thead.appendChild(tr); t.appendChild(thead);
+    var tb = el('tbody');
+    rows.forEach(function (row) {
+      var r = el('tr');
+      cols.forEach(function (c) {
+        var v = row[c.f];
+        var td = el('td', (c.r ? 'r ' : '') + (c.dim ? 'dim' : ''), c.fmt ? c.fmt(v, row) : (v === null || v === undefined ? '—' : String(v)));
+        if (c.tone) tone(td, v);
+        r.appendChild(td);
+      });
+      tb.appendChild(r);
+    });
+    t.appendChild(tb);
+  }
+
+  function renderHeader(m) {
+    document.getElementById('stamp').textContent = String(m.snapshot || '').slice(0, 16).replace('T', ' ');
+    var nk = byName(m.indices || [], '日経平均');
+    var cme = byName(m.futures || [], 'CME 円建て');
+    var lede = clear(document.getElementById('lede'));
+    if (!nk) { lede.textContent = ''; return; }
+    lede.appendChild(document.createTextNode('日経平均は前日比 '));
+    lede.appendChild(tone(el('b', '', sgn(nk.change) + ' 円'), nk.change));
+    lede.appendChild(document.createTextNode('（'));
+    lede.appendChild(tone(el('b', '', pct(nk.pct)), nk.pct));
+    lede.appendChild(document.createTextNode('）。'));
+    if (cme) {
+      lede.appendChild(document.createTextNode('夜間のCME円建て先物は、日経平均の終値と比べて '));
+      lede.appendChild(tone(el('b', '', sgn(cme.vs_index) + ' 円'), cme.vs_index));
+      lede.appendChild(document.createTextNode(' の水準です。'));
+    }
+  }
+
+  function renderTiles(m) {
+    var box = clear(document.getElementById('tiles'));
+    var defs = [['日経平均', '前営業日の終値', byName(m.indices || [], '日経平均'), 'value'],
+      ['225先物 CME円建て', '夜間・各市場の前日比', byName(m.futures || [], 'CME 円建て'), 'price'],
+      ['TOPIX', '前営業日の終値', byName(m.indices || [], 'TOPIX'), 'value'],
+      ['NYダウ', '米国の終値', byName(m.indices || [], 'NYダウ'), 'value'],
+      ['ナスダック100', '米国の終値', byName(m.indices || [], 'ナスダック100'), 'value'],
+      ['ドル円', '円／ドル', byName(m.indices || [], 'ドル円'), 'value']];
+    defs.forEach(function (d) {
+      if (!d[2]) return;
+      var t = el('div', 'tile');
+      t.appendChild(el('div', 'lab', d[0])); t.appendChild(el('div', 'when', d[1]));
+      t.appendChild(el('div', 'big', num(d[2][d[3]])));
+      var c = el('div', 'chg');
+      c.appendChild(tone(el('span', '', sgn(d[2].change)), d[2].change));
+      c.appendChild(tone(el('span', '', pct(d[2].pct)), d[2].pct));
+      t.appendChild(c); box.appendChild(t);
+    });
+  }
+
+  function renderFilters() {
+    var box = clear(document.getElementById('filters'));
+    [['', 'すべて']].concat(CATS.map(function (c) { return [c[0], c[0]]; })).forEach(function (c) {
+      var b = el('button', 'pill', c[1]); b.type = 'button';
+      b.setAttribute('aria-pressed', String(state.cat === c[0]));
+      b.addEventListener('click', function () {
+        state.cat = c[0];
+        try { localStorage.setItem('mk-cat', state.cat); } catch (e) {}
+        renderFilters(); renderNewsdesk(state.watch);
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function renderNewsdesk(w) {
+    var box = clear(document.getElementById('newsdesk'));
+    if (!w) return;
+    (w.watch || []).forEach(function (r) {
+      var col = el('div', 'nd-col');
+      var head = el('div', 'nd-head');
+      head.appendChild(el('h4', '', r.name));
+      head.appendChild(tone(el('span', '', pct(r.pct)), r.pct));
+      if (r.status) head.appendChild(tone(el('span', 'badge', r.status), r.change));
+      col.appendChild(head);
+      var shown = 0;
+      CATS.forEach(function (c) {
+        if (state.cat && state.cat !== c[0]) return;
+        var ps = (w.watch_points || []).filter(function (p) { return p.code === r.code && p.kind === c[0]; });
+        var ns = (w.watch_news || []).filter(function (n) { return n.code === r.code && n.category === c[0]; })
+          .sort(function (a, b) { return (b.important ? 1 : 0) - (a.important ? 1 : 0) || String(b.at).localeCompare(String(a.at)); });
+        if (!ps.length && !ns.length) return;
+        shown++;
+        var g = el('div', 'grp');
+        var lab = el('div', 'grp-lab'); var d = el('span', 'dot'); d.style.background = c[1];
+        lab.appendChild(d); lab.appendChild(document.createTextNode(c[0])); g.appendChild(lab);
+        ps.forEach(function (p) { g.appendChild(el('p', 'point', p.text)); });
+        if (ns.length) {
+          var ul = el('ul', 'heads');
+          ns.forEach(function (n) {
+            var li = el('li');
+            if (n.important) li.appendChild(el('span', 'flag', '重要'));
+            var a = el('a', '', n.title); a.href = n.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+            li.appendChild(a); li.appendChild(el('span', 'meta', shortDate(n.at) + '・' + (n.media || '')));
+            ul.appendChild(li);
+          });
+          g.appendChild(ul);
+        }
+        col.appendChild(g);
+      });
+      if (!shown) col.appendChild(el('p', 'note', 'この種類のニュースはありません。'));
+      box.appendChild(col);
+    });
+  }
+
+  function stats(items, obj) {
+    var dl = el('dl', 'stats');
+    items.forEach(function (it) {
+      var v = obj[it[1]];
+      var text = it[2] === 'n' ? (v === null || v === undefined ? '—' : num(v) + (it[3] || '')) : (v === null || v === undefined || v === '' ? '—' : String(v));
+      var d = el('div'); d.appendChild(el('dt', '', it[0])); d.appendChild(el('dd', '', text)); dl.appendChild(d);
+    });
+    return dl;
+  }
+
+  function renderStocks(w) {
+    var box = clear(document.getElementById('stocks'));
+    if (!w) return;
+    (w.watch || []).forEach(function (r) {
+      var card = el('article', 'card'); card.id = 'stock-' + r.code;
+      var head = el('div', 'nd-head');
+      head.appendChild(el('h3', '', r.name)); head.appendChild(el('span', 'sub', r.code));
+      if (r.status) head.appendChild(tone(el('span', 'badge', r.status), r.change));
+      card.appendChild(head);
+      var pr = el('div', 'price-row');
+      pr.appendChild(el('div', 'big', num(r.price)));
+      var c = el('div', 'chg');
+      c.appendChild(tone(el('span', '', sgn(r.change) + ' 円'), r.change));
+      c.appendChild(tone(el('span', '', pct(r.pct)), r.pct));
+      pr.appendChild(c); card.appendChild(pr);
+      if (r.pts !== undefined && r.pts !== null) {
+        var p = el('div', 'pts');
+        p.appendChild(el('span', 'sub', '夜間PTS')); p.appendChild(el('span', '', num(r.pts) + ' 円'));
+        p.appendChild(tone(el('span', '', sgn(r.pts_change)), r.pts_change)); p.appendChild(tone(el('span', '', pct(r.pts_pct)), r.pts_pct));
+        p.appendChild(el('span', 'sub', r.pts_at || '')); card.appendChild(p);
+      }
+      card.appendChild(stats([['前日終値', 'prev_close', 'n', ' 円'], ['始値', 'open', 'n', ' 円'], ['高値', 'high', 'n', ' 円'], ['安値', 'low', 'n', ' 円'],
+        ['出来高', 'volume', 'n', ' 株'], ['配当利回り', 'yield', 'n', '%'], ['PER（会社予想）', 'per', 'n', ' 倍'], ['PBR', 'pbr', 'n', ' 倍'],
+        ['時価総額', 'mcap', 'n', ' 百万円'], ['年初来高値', 'ytd_high', 'n', ' 円'], ['年初来安値', 'ytd_low', 'n', ' 円']], r));
+      if (r.target !== undefined || r.diagnosis !== undefined) {
+        card.appendChild(el('p', 'subhead', 'みんかぶの予想'));
+        card.appendChild(stats([['目標株価', 'target', 'n', ' 円'], ['株価診断', 'diagnosis'], ['個人予想', 'individual'], ['アナリスト', 'analyst']], r));
+      }
+      card.appendChild(el('p', 'subhead', 'Yahoo!掲示板の評価（直近1週間）'));
+      card.appendChild(stats([['買いたい', 'board_buy', 'n', '%'], ['売りたい', 'board_sell', 'n', '%'], ['次の予定', 'next_event']], r));
+      var co = (w.company || []).filter(function (x) { return x.code === r.code; })[0];
+      if (co) {
+        card.appendChild(el('p', 'subhead', '会社情報'));
+        card.appendChild(el('p', 'point', co.business));
+        if (co.brands) card.appendChild(el('p', 'note', '主なブランド・グループ会社：' + co.brands));
+        card.appendChild(stats([['代表者', 'ceo'], ['本社', 'address'], ['設立', 'founded'], ['上場', 'listed'], ['決算期', 'fiscal'],
+          ['従業員（連結）', 'employees', 'n', ' 人'], ['平均年収', 'salary', 'n', ' 千円'], ['筆頭株主', 'holder'], ['筆頭株主の保有比率', 'holder_pct', 'n', '%']], co));
+      }
+      box.appendChild(card);
+    });
+  }
+
+  function renderFutures(m) {
+    var rows = m.futures || [];
+    table('fut-table', [{ label: '市場', f: 'name' }, { label: '価格', f: 'price', r: 1, fmt: num }, { label: '前日比', f: 'change', r: 1, fmt: sgn, tone: 1 },
+      { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 }, { label: '時刻', f: 'at', dim: 1 }], rows);
+    var box = clear(document.getElementById('fut-chart'));
+    if (!rows.length) return;
+    var NS = 'http://www.w3.org/2000/svg';
+    var W = Math.max(300, box.clientWidth || 600), step = 30, barH = 20, top = 4, axisH = 22, H = top + rows.length * step + axisH;
+    var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', '市場別の225先物と日経平均終値との差');
+    box.appendChild(svg);
+    function txt(x, y, s, cls, anchor) { var t = document.createElementNS(NS, 'text'); t.setAttribute('x', x); t.setAttribute('y', y);
+      if (cls) t.setAttribute('class', cls); if (anchor) t.setAttribute('text-anchor', anchor); t.textContent = s; svg.appendChild(t); return t; }
+    var maxL = 0, maxE = 0;
+    rows.forEach(function (r) { var a = txt(0, 0, r.name, 'nm'); maxL = Math.max(maxL, a.getComputedTextLength()); svg.removeChild(a);
+      var b = txt(0, 0, sgn(r.vs_index), 'end'); maxE = Math.max(maxE, b.getComputedTextLength()); svg.removeChild(b); });
+    var left = maxL + 10, right = maxE + 10;
+    var lo = Math.min(0, Math.min.apply(null, rows.map(function (r) { return r.vs_index; })));
+    var hi = Math.max(0, Math.max.apply(null, rows.map(function (r) { return r.vs_index; })));
+    var span = hi - lo || 1, stepT = Math.pow(10, Math.floor(Math.log(span / 3) / Math.LN10));
+    [1, 2, 5, 10].some(function (k) { if (span / (stepT * k) <= 4) { stepT = stepT * k; return true; } return false; });
+    lo = Math.floor(lo / stepT) * stepT; hi = Math.ceil(hi / stepT) * stepT;
+    function x(v) { return left + (v - lo) / (hi - lo || 1) * (W - left - right); }
+    for (var v = lo; v <= hi + 1e-9; v += stepT) {
+      var ln = document.createElementNS(NS, 'line'); ln.setAttribute('x1', x(v)); ln.setAttribute('x2', x(v)); ln.setAttribute('y1', top); ln.setAttribute('y2', H - axisH);
+      ln.setAttribute('stroke', v === 0 ? 'var(--muted)' : 'var(--line)'); svg.appendChild(ln);
+      txt(x(v), H - 6, nf.format(v), '', 'middle');
+    }
+    rows.forEach(function (r, i) {
+      var y = top + i * step;
+      txt(left - 10, y + barH / 2 + 4, r.name, 'nm', 'end');
+      var rect = document.createElementNS(NS, 'rect');
+      rect.setAttribute('x', x(Math.min(0, r.vs_index))); rect.setAttribute('y', y); rect.setAttribute('height', barH); rect.setAttribute('rx', 3);
+      rect.setAttribute('width', Math.abs(x(r.vs_index) - x(0)));
+      rect.setAttribute('fill', i === 0 ? 'var(--bar)' : 'var(--bar-muted)');
+      var tt = document.createElementNS(NS, 'title'); tt.textContent = r.name + '：' + num(r.price) + '（終値との差 ' + sgn(r.vs_index) + ' 円・' + (r.at || '') + '）';
+      rect.appendChild(tt); svg.appendChild(rect);
+      txt(x(Math.max(0, r.vs_index)) + 6, y + barH / 2 + 4, sgn(r.vs_index), 'end');
+    });
+  }
+
+  function renderRest(m) {
+    table('world-table', [{ label: '銘柄', f: 'name' }, { label: '区分', f: 'group', dim: 1 }, { label: '値', f: 'value', r: 1, fmt: num },
+      { label: '前日比', f: 'change', r: 1, fmt: sgn, tone: 1 }, { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 },
+      { label: '時刻', f: 'at', dim: 1 }, { label: '出典', f: 'site', dim: 1 }], m.indices || []);
+    var rk = [{ label: '順位', f: 'rank', dim: 1 }, { label: '銘柄', f: 'name' }, { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 }];
+    table('gainers', rk, m.gainers || []); table('losers', rk, m.losers || []);
+    var br = clear(document.getElementById('breadth'));
+    (m.breadth || []).forEach(function (b) { var s = el('span', '', b.side + ' '); s.appendChild(tone(el('b', '', num(b.companies)), b.side === '値上がり' ? 1 : -1)); s.appendChild(document.createTextNode(' 社')); br.appendChild(s); });
+    var tp = clear(document.getElementById('topics'));
+    (m.topics || []).forEach(function (t) { var li = el('li'); li.appendChild(el('span', '', t.title)); if (t.stocks) li.appendChild(el('span', 'sub', '影響銘柄：' + t.stocks)); tp.appendChild(li); });
+    var hl = clear(document.getElementById('headlines'));
+    (m.news || []).forEach(function (n) { var li = el('li'); var t;
+      if (n.url) { t = el('a', '', n.title); t.href = n.url; t.target = '_blank'; t.rel = 'noopener noreferrer'; } else { t = el('span', '', n.title); }
+      li.appendChild(t); li.appendChild(el('span', 'sub', shortDate(n.at) + (n.media ? '・' + n.media : ''))); hl.appendChild(li); });
+    var th = clear(document.getElementById('themes'));
+    (m.themes || []).forEach(function (t) { var li = el('li'); li.appendChild(el('span', 'n', t.rank)); li.appendChild(document.createTextNode(t.name)); th.appendChild(li); });
+    var ev = clear(document.getElementById('events'));
+    (m.events || []).forEach(function (e) { var li = el('li'); li.appendChild(el('span', '', e.event)); li.appendChild(el('span', 'sub', e.date)); ev.appendChild(li); });
+    table('funds-table', [{ label: 'ランキング', f: 'category', dim: 1 }, { label: '順位', f: 'rank', dim: 1 }, { label: 'ファンド', f: 'name' },
+      { label: '値', f: 'value', r: 1, fmt: function (v, row) { return row.unit === '%' ? pct(v) : num(v); } }, { label: '単位', f: 'unit', dim: 1 }], m.funds || []);
+  }
+
+  function render() {
+    var m = state.market, w = state.watch;
+    if (m) { renderHeader(m); renderTiles(m); renderFutures(m); renderRest(m); }
+    renderFilters(); renderNewsdesk(w); renderStocks(w);
+  }
+
+  function getJSON(path) {
+    return fetch(path + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) {
+      if (!r.ok) throw new Error(path + ' を読み込めませんでした（' + r.status + '）');
+      return r.json();
+    });
+  }
+
+  var btn = document.getElementById('reload');
+  function load() {
+    btn.disabled = true; btn.textContent = '更新中…';
+    var err = document.getElementById('error');
+    Promise.all([getJSON('data/market.json'), getJSON('data/watch.json')]).then(function (res) {
+      state.market = res[0]; state.watch = res[1]; err.hidden = true; render();
+    }).catch(function (e) {
+      err.hidden = false; err.textContent = 'データを読み込めませんでした。通信状態を確かめて、もう一度「最新の情報に更新」を押してください。（' + e.message + '）';
+    }).then(function () { btn.disabled = false; btn.textContent = '最新の情報に更新'; });
+  }
+  btn.addEventListener('click', load);
+  var lastW = window.innerWidth;
+  window.addEventListener('resize', function () { if (state.market && Math.abs(window.innerWidth - lastW) > 40) { lastW = window.innerWidth; renderFutures(state.market); } });
+  load();
+})();
+</script>
+</body>
+</html>
