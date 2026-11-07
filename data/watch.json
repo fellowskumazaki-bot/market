@@ -100,121 +100,201 @@
    "id": "2914-1",
    "code": "2914",
    "kind": "世界情勢",
-   "text": "11/6、ロシアの現地法人4社が現地当局の一時管理下に置かれたと報じられ、ストップ安まで売られた。"
+   "text": "11/6、ロシアの現地法人4社が現地当局の一時管理下に置かれたと報じられ、ストップ安まで売られた。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/2914.T/news"
+   }
   },
   {
    "id": "2914-2",
    "code": "2914",
    "kind": "世界情勢",
-   "text": "JTは同日「当社グループのロシア事業について」を開示し、状況を確認中と発表。日本政府も撤回を求めていると報道された。"
+   "text": "JTは同日「当社グループのロシア事業について」を開示し、状況を確認中と発表。日本政府も撤回を求めていると報道された。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/2914.T/news"
+   }
   },
   {
    "id": "2914-3",
    "code": "2914",
    "kind": "株価の動き",
-   "text": "夜間PTSではさらに下がり、東証終値より949円安い5,320円。"
+   "text": "夜間PTSではさらに下がり、東証終値より949円安い5,320円。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/2914.T/news"
+   }
   },
   {
    "id": "2914-4",
    "code": "2914",
    "kind": "決算",
-   "text": "10/29発表の第3四半期累計は売上収益+13.6%、営業利益+24.2%の増収増益で、通期予想も上方修正していた。"
+   "text": "10/29発表の第3四半期累計は売上収益+13.6%、営業利益+24.2%の増収増益で、通期予想も上方修正していた。",
+   "src": {
+    "label": "Yahoo!ファイナンス（決算短信の要約）",
+    "url": "https://finance.yahoo.co.jp/quote/2914.T"
+   }
   },
   {
    "id": "2914-5",
    "code": "2914",
    "kind": "リスク",
-   "text": "売上・利益の過半が海外のため為替の影響を受けやすい。各国のたばこ規制・増税やロシア情勢も業績に影響する。"
+   "text": "売上・利益の過半が海外のため為替の影響を受けやすい。各国のたばこ規制・増税やロシア情勢も業績に影響する。",
+   "src": {
+    "label": "Yahoo!ファイナンス（業績チェックポイント）",
+    "url": "https://finance.yahoo.co.jp/quote/2914.T"
+   }
   },
   {
    "id": "2914-6",
    "code": "2914",
    "kind": "決算",
-   "text": "通期の業績予想は上方修正済み。次回の決算発表日はまだ公表されていない（直近は10/29）。"
+   "text": "通期の業績予想は上方修正済み。次回の決算発表日はまだ公表されていない（直近は10/29）。",
+   "src": {
+    "label": "Yahoo!ファイナンス（決算短信の要約）",
+    "url": "https://finance.yahoo.co.jp/quote/2914.T"
+   }
   },
   {
    "id": "9984-1",
    "code": "9984",
    "kind": "株価の動き",
-   "text": "11/2〜11/6の5営業日で4,410円から3,549円へ約19.5%下落。11/5に-6.77%、11/6に-10.83%と下げが続いた。"
+   "text": "11/2〜11/6の5営業日で4,410円から3,549円へ約19.5%下落。11/5に-6.77%、11/6に-10.83%と下げが続いた。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/9984.T/news"
+   }
   },
   {
    "id": "9984-2",
    "code": "9984",
    "kind": "世界情勢",
-   "text": "中国当局がABBのロボティクス事業の買収を認めないと通知したと報じられ（11/6）、関連の開示も出た。"
+   "text": "中国当局がABBのロボティクス事業の買収を認めないと通知したと報じられ（11/6）、関連の開示も出た。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/9984.T/news"
+   }
   },
   {
    "id": "9984-3",
    "code": "9984",
    "kind": "世界情勢",
-   "text": "米国でAI規制への警戒が強まり、AI関連株全体に売りが広がった（Yahoo!のAIトピックス）。"
+   "text": "米国でAI規制への警戒が強まり、AI関連株全体に売りが広がった（Yahoo!のAIトピックス）。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/9984.T/news"
+   }
   },
   {
    "id": "9984-4",
    "code": "9984",
    "kind": "株価の動き",
-   "text": "夜間PTSでは反発し、東証終値より157.8円高い3,706.8円。"
+   "text": "夜間PTSでは反発し、東証終値より157.8円高い3,706.8円。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/9984.T/news"
+   }
   },
   {
    "id": "9984-5",
    "code": "9984",
    "kind": "決算",
-   "text": "11/10に決算発表予定。保有株の値動きで投資損益が大きく変わるため、利益が振れやすい。"
+   "text": "11/10に決算発表予定。保有株の値動きで投資損益が大きく変わるため、利益が振れやすい。",
+   "src": {
+    "label": "Yahoo!ファイナンス（決算短信の要約）",
+    "url": "https://finance.yahoo.co.jp/quote/9984.T"
+   }
   },
   {
    "id": "9984-6",
    "code": "9984",
    "kind": "決算",
-   "text": "前回（8/6）の第1四半期は売上高+10.9%の2兆196億円。一方、最終利益は株式報酬や為替差損などで-17.7%の3,473億円だった。"
+   "text": "前回（8/6）の第1四半期は売上高+10.9%の2兆196億円。一方、最終利益は株式報酬や為替差損などで-17.7%の3,473億円だった。",
+   "src": {
+    "label": "Yahoo!ファイナンス（決算短信の要約）",
+    "url": "https://finance.yahoo.co.jp/quote/9984.T"
+   }
   },
   {
    "id": "2914-7",
    "code": "2914",
    "kind": "配当",
-   "text": "今期（2026年12月期）の1株配当は会社予想で272円、配当利回りは4.34%。みんかぶでは連続増配銘柄とされている。"
+   "text": "今期（2026年12月期）の1株配当は会社予想で272円、配当利回りは4.34%。みんかぶでは連続増配銘柄とされている。",
+   "src": {
+    "label": "Yahoo!ファイナンス（配当）",
+    "url": "https://finance.yahoo.co.jp/quote/2914.T/dividend"
+   }
   },
   {
    "id": "9984-7",
    "code": "9984",
    "kind": "配当",
-   "text": "1株配当は会社予想で11円、配当利回りは0.31%と低め。"
+   "text": "1株配当は会社予想で11円、配当利回りは0.31%と低め。",
+   "src": {
+    "label": "Yahoo!ファイナンス（配当）",
+    "url": "https://finance.yahoo.co.jp/quote/9984.T/dividend"
+   }
   },
   {
    "id": "9434-1",
    "code": "9434",
    "kind": "株価の動き",
-   "text": "10/30〜11/5に232.7円から244.1円へ約4.9%上がったあと、11/6は-3.56%の235.4円に反落。"
+   "text": "10/30〜11/5に232.7円から244.1円へ約4.9%上がったあと、11/6は-3.56%の235.4円に反落。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/9434.T/news"
+   }
   },
   {
    "id": "9434-2",
    "code": "9434",
    "kind": "株価の動き",
-   "text": "親会社のソフトバンクグループが-10.83%と大きく下げた日も、下げ幅は-3.56%にとどまった。"
+   "text": "親会社のソフトバンクグループが-10.83%と大きく下げた日も、下げ幅は-3.56%にとどまった。",
+   "src": {
+    "label": "Yahoo!ファイナンス（AI値動き解説・銘柄ニュース）",
+    "url": "https://finance.yahoo.co.jp/quote/9434.T/news"
+   }
   },
   {
    "id": "9434-3",
    "code": "9434",
    "kind": "決算",
-   "text": "11/9に決算発表予定。前回（8/4）の第1四半期は売上高+9.4%の1兆8,147億円で過去最高、営業利益は+4.0%。通期予想は据え置き。"
+   "text": "11/9に決算発表予定。前回（8/4）の第1四半期は売上高+9.4%の1兆8,147億円で過去最高、営業利益は+4.0%。通期予想は据え置き。",
+   "src": {
+    "label": "Yahoo!ファイナンス（決算短信の要約）",
+    "url": "https://finance.yahoo.co.jp/quote/9434.T"
+   }
   },
   {
    "id": "9434-4",
    "code": "9434",
    "kind": "業界・競合",
-   "text": "競合のKDDIは11/6の決算で7-9月期が16%減益、NTTは11/4に通期予想を1%上方修正した。"
+   "text": "競合のKDDIは11/6の決算で7-9月期が16%減益、NTTは11/4に通期予想を1%上方修正した。",
+   "src": {
+    "label": "株探ニュース（KDDI・NTTの決算速報）",
+    "url": "https://finance.yahoo.co.jp/quote/9434.T/news"
+   }
   },
   {
    "id": "9434-5",
    "code": "9434",
    "kind": "配当",
-   "text": "1株配当は会社予想で8.80円、配当利回りは3.74%。"
+   "text": "1株配当は会社予想で8.80円、配当利回りは3.74%。",
+   "src": {
+    "label": "Yahoo!ファイナンス（配当）",
+    "url": "https://finance.yahoo.co.jp/quote/9434.T/dividend"
+   }
   },
   {
    "id": "9434-6",
    "code": "9434",
    "kind": "リスク",
-   "text": "自己資本比率は16.0%と低めで、有利子負債が増える局面もある（Yahoo!ファイナンスの業績要約）。"
+   "text": "自己資本比率は16.0%と低めで、有利子負債が増える局面もある（Yahoo!ファイナンスの業績要約）。",
+   "src": {
+    "label": "Yahoo!ファイナンス（業績チェックポイント）",
+    "url": "https://finance.yahoo.co.jp/quote/9434.T"
+   }
   }
  ],
  "watch_news": [
@@ -226,7 +306,8 @@
    "media": "フィスコ",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/05aa87d52b925313984db8713b96e80ab586c110",
-   "category": "株価の動き"
+   "category": "株価の動き",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "2914-n2",
@@ -236,7 +317,8 @@
    "media": "ダイヤモンド・ザイ",
    "important": true,
    "url": "https://finance.yahoo.co.jp/news/detail/ebf8869a979b120d6e9d8b25ffaf15fdab26db64",
-   "category": "世界情勢"
+   "category": "世界情勢",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "2914-n3",
@@ -246,7 +328,8 @@
    "media": "株探ニュース",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/9448278f9a7dc0028973535c62b264e8db698e67",
-   "category": "株価の動き"
+   "category": "株価の動き",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "2914-n4",
@@ -256,7 +339,8 @@
    "media": "株探ニュース",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/a8fe0d3e4996f2061708fd67fa541691a6676599",
-   "category": "株価の動き"
+   "category": "株価の動き",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "2914-n5",
@@ -266,7 +350,8 @@
    "media": "フィスコ",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/225a120c4d8c7a069b90e386e1b79f52cd4b7706",
-   "category": "株価の動き"
+   "category": "株価の動き",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "2914-n6",
@@ -276,7 +361,8 @@
    "media": "フィスコ",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/2cc139ca6a1b3162f84aa18f94809d5872ea488a",
-   "category": "株価の動き"
+   "category": "株価の動き",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9984-n1",
@@ -286,7 +372,8 @@
    "media": "フィスコ",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/9061c8351dfa3355fb21d992429a8257681f5ad6",
-   "category": "株価の動き"
+   "category": "株価の動き",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9984-n2",
@@ -296,7 +383,8 @@
    "media": "時事通信",
    "important": true,
    "url": "https://finance.yahoo.co.jp/news/detail/4d41fc78c0f5d08080ecd1273cfcb53a208cace6",
-   "category": "世界情勢"
+   "category": "世界情勢",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9984-n3",
@@ -306,7 +394,8 @@
    "media": "株探ニュース",
    "important": true,
    "url": "https://finance.yahoo.co.jp/news/detail/e623d6c0674a05efd050c042569c6618a129c886",
-   "category": "決算"
+   "category": "決算",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9984-n4",
@@ -316,7 +405,8 @@
    "media": "トレーダーズ・ウェブ",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/254bae2ae17a306e9fc430aef27817877a533cb8",
-   "category": "世界情勢"
+   "category": "世界情勢",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9984-n5",
@@ -326,7 +416,8 @@
    "media": "トウシル",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/daaae829d00a7b08dc4930438191cebc4964945d",
-   "category": "世界情勢"
+   "category": "世界情勢",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9984-n6",
@@ -336,7 +427,8 @@
    "media": "時事通信",
    "important": false,
    "url": "https://finance.yahoo.co.jp/news/detail/7cec79059254de8c4bc800df0f84ca265e58fc06",
-   "category": "株価の動き"
+   "category": "株価の動き",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9434-n1",
@@ -346,7 +438,8 @@
    "media": "株探ニュース",
    "important": false,
    "category": "業界・競合",
-   "url": "https://finance.yahoo.co.jp/news/detail/c0e95f2a40c0f4ecf240ae88c91075d013a54928"
+   "url": "https://finance.yahoo.co.jp/news/detail/c0e95f2a40c0f4ecf240ae88c91075d013a54928",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9434-n2",
@@ -356,7 +449,8 @@
    "media": "株探ニュース",
    "important": false,
    "category": "業界・競合",
-   "url": "https://finance.yahoo.co.jp/news/detail/0eb061ccf4fc5c7fc97b0212b804158a107770d9"
+   "url": "https://finance.yahoo.co.jp/news/detail/0eb061ccf4fc5c7fc97b0212b804158a107770d9",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9434-n3",
@@ -366,7 +460,8 @@
    "media": "トレーダーズ・ウェブ",
    "important": false,
    "category": "提携・事業",
-   "url": "https://finance.yahoo.co.jp/news/detail/ede0b4f70273731c3cb58ce7ef7713abfed12f87"
+   "url": "https://finance.yahoo.co.jp/news/detail/ede0b4f70273731c3cb58ce7ef7713abfed12f87",
+   "site": "Yahoo!ファイナンス"
   },
   {
    "id": "9434-n4",
@@ -376,7 +471,8 @@
    "media": "株探ニュース",
    "important": true,
    "category": "決算",
-   "url": "https://finance.yahoo.co.jp/news/detail/e623d6c0674a05efd050c042569c6618a129c886"
+   "url": "https://finance.yahoo.co.jp/news/detail/e623d6c0674a05efd050c042569c6618a129c886",
+   "site": "Yahoo!ファイナンス"
   }
  ],
  "company": [

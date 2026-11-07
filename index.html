@@ -172,6 +172,15 @@
   .heads li { font-size: 13px; line-height: 1.5; }
   .heads a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
   .heads .meta { color: var(--muted); white-space: nowrap; margin-left: 6px; }
+  .src { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .src-lab { border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; font-size: 11px; }
+  .src-name { color: var(--fg); }
+  .src-open { color: var(--accent); text-decoration: none; white-space: nowrap; }
+  .src-open::after { content: " ↗"; }
+  .src-open:hover { text-decoration: underline; }
+  .news-link { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+  .heads li { display: grid; gap: 1px; }
+  .point + .src { margin-top: -2px; margin-bottom: 4px; }
   .flag { color: var(--down); font-weight: 600; margin-right: 6px; white-space: nowrap; }
   .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 8px 14px; margin: 0; }
   .stats div { display: grid; min-width: 0; }
@@ -308,6 +317,21 @@
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined && text !== null) n.textContent = text; return n; }
   function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); return n; }
   function byName(rows, name) { for (var i = 0; i < rows.length; i++) if (rows[i].name === name) return rows[i]; return null; }
+  // 出典の1行：「出典 配信元（掲載サイト）・日時  記事を開く↗」
+  function srcLine(media, site, url, at, labText, openText) {
+    var d = el('span', 'src');
+    d.appendChild(el('span', 'src-lab', labText || '出典'));
+    d.appendChild(el('span', 'src-name', (media || '不明') + (site ? '（' + site + '）' : '')));
+    if (at) d.appendChild(el('span', 'src-at', shortDate(at)));
+    if (url) {
+      var a = el('a', 'src-open', openText || '記事を開く'); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      try { a.title = new URL(url).hostname; } catch (e) {}
+      d.appendChild(a);
+    } else {
+      d.appendChild(el('span', 'src-at', 'リンクなし'));
+    }
+    return d;
+  }
   function shortDate(s) {
     var m = String(s || '').match(/^\d{4}-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/);
     return m ? Number(m[1]) + '/' + Number(m[2]) + (m[3] ? ' ' + Number(m[3]) + ':' + m[4] : '') : String(s || '');
@@ -660,14 +684,17 @@
         var g = el('div', 'grp');
         var lab = el('div', 'grp-lab'); var d = el('span', 'dot'); d.style.background = c[1];
         lab.appendChild(d); lab.appendChild(document.createTextNode(c[0])); g.appendChild(lab);
-        ps.forEach(function (p) { g.appendChild(el('p', 'point', p.text)); });
+        ps.forEach(function (p) {
+          g.appendChild(el('p', 'point', p.text));
+          if (p.src && p.src.url) g.appendChild(srcLine(p.src.label, null, p.src.url, null, '要約の元', '元のページを開く'));
+        });
         if (ns.length) {
           var ul = el('ul', 'heads');
           ns.forEach(function (n) {
             var li = el('li');
             if (n.important) li.appendChild(el('span', 'flag', '重要'));
             var a = el('a', '', n.title); a.href = n.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
-            li.appendChild(a); li.appendChild(el('span', 'meta', shortDate(n.at) + '・' + (n.media || '')));
+            li.appendChild(a); li.appendChild(srcLine(n.media, n.site, n.url, n.at));
             ul.appendChild(li);
           });
           g.appendChild(ul);
@@ -781,11 +808,15 @@
     var br = clear(document.getElementById('breadth'));
     (m.breadth || []).forEach(function (b) { var s = el('span', '', b.side + ' '); s.appendChild(tone(el('b', '', num(b.companies)), b.side === '値上がり' ? 1 : -1)); s.appendChild(document.createTextNode(' 社')); br.appendChild(s); });
     var tp = clear(document.getElementById('topics'));
-    (m.topics || []).forEach(function (t) { var li = el('li'); li.appendChild(el('span', '', t.title)); if (t.stocks) li.appendChild(el('span', 'sub', '影響銘柄：' + t.stocks)); tp.appendChild(li); });
+    function titleEl(title, url) {
+      if (!url) return el('span', '', title);
+      var a = el('a', 'news-link', title); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a;
+    }
+    (m.topics || []).forEach(function (t) { var li = el('li'); li.appendChild(titleEl(t.title, t.url)); if (t.stocks) li.appendChild(el('span', 'sub', '影響銘柄：' + t.stocks));
+      li.appendChild(srcLine('Yahoo!ファイナンス', 'マーケットAIトピックス', t.url, null, null, 'トピックを開く')); tp.appendChild(li); });
     var hl = clear(document.getElementById('headlines'));
-    (m.news || []).forEach(function (n) { var li = el('li'); var t;
-      if (n.url) { t = el('a', '', n.title); t.href = n.url; t.target = '_blank'; t.rel = 'noopener noreferrer'; } else { t = el('span', '', n.title); }
-      li.appendChild(t); li.appendChild(el('span', 'sub', shortDate(n.at) + (n.media ? '・' + n.media : ''))); hl.appendChild(li); });
+    (m.news || []).forEach(function (n) { var li = el('li');
+      li.appendChild(titleEl(n.title, n.url)); li.appendChild(srcLine(n.media, n.site, n.url, n.at)); hl.appendChild(li); });
     var th = clear(document.getElementById('themes'));
     (m.themes || []).forEach(function (t) { var li = el('li'); li.appendChild(el('span', 'n', t.rank)); li.appendChild(document.createTextNode(t.name)); th.appendChild(li); });
     var ev = clear(document.getElementById('events'));

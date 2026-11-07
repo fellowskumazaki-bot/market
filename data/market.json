@@ -335,69 +335,109 @@
   {
    "no": 1,
    "title": "日米株指数が同時急落、全面リスクオフ",
-   "stocks": "NF 日経Wインバ、SAM 日経ベア2倍ETF、iFree TPXWベア"
+   "stocks": "NF 日経Wインバ、SAM 日経ベア2倍ETF、iFree TPXWベア",
+   "url": "https://finance.yahoo.co.jp/news/ai-market/detail/3856",
+   "site": "Yahoo!ファイナンス マーケットAIトピックス"
   },
   {
    "no": 2,
    "title": "VIX・ダブルインバース上位、ヘッジ需要増",
-   "stocks": "NF 日経Wインバ、SAM 日経ベア2倍ETF、SAM TOPIXベア2倍ETF"
+   "stocks": "NF 日経Wインバ、SAM 日経ベア2倍ETF、SAM TOPIXベア2倍ETF",
+   "url": "https://finance.yahoo.co.jp/news/ai-market/detail/3862",
+   "site": "Yahoo!ファイナンス マーケットAIトピックス"
   },
   {
    "no": 3,
    "title": "米雇用統計は未発表、NFP・賃金が次の焦点",
-   "stocks": "ソフトＢＧ、東エレク、ソニーＧ"
+   "stocks": "ソフトＢＧ、東エレク、ソニーＧ",
+   "url": "https://finance.yahoo.co.jp/news/ai-market/detail/3874",
+   "site": "Yahoo!ファイナンス マーケットAIトピックス"
   },
   {
    "no": 4,
    "title": "米AI規制警戒でAI関連に売り波及",
-   "stocks": "レーザテク、スクリンＨ、ソシオネク"
+   "stocks": "レーザテク、スクリンＨ、ソシオネク",
+   "url": "https://finance.yahoo.co.jp/news/ai-market/detail/3859",
+   "site": "Yahoo!ファイナンス マーケットAIトピックス"
   },
   {
    "no": 5,
    "title": "豪・英の利上げで世界の金融引き締め観測",
-   "stocks": "三菱ＵＦＪ、三井住友Ｆ、みずほＦＧ"
+   "stocks": "三菱ＵＦＪ、三井住友Ｆ、みずほＦＧ",
+   "url": "https://finance.yahoo.co.jp/news/ai-market/detail/3871",
+   "site": "Yahoo!ファイナンス マーケットAIトピックス"
   }
  ],
  "news": [
   {
-   "at": "11/07 10:30",
-   "title": "来週の【新規公開(IPO)銘柄】 レセプショ…"
+   "at": "2026-11-07 11:00",
+   "title": "植田日銀総裁、物価2％定着に意欲＝上振れリスクに言及",
+   "media": "時事通信",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/99a19416b98726638ba5fd584e60cb6be01d22a8"
   },
   {
-   "at": "11/07 09:01",
-   "title": "NY債券：反落、イールドカーブは平坦化"
+   "at": "2026-11-07 10:56",
+   "title": "米国市場サマリー（6日）",
+   "media": "時事通信",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/35f39dbff7973d9a38425b37dff3b1de63f9be54"
   },
   {
-   "at": "11/07 09:01",
-   "title": "NY原油先物：小幅続伸、米イラン紛争の不透明感くすぶり下値限定"
+   "at": "2026-11-07 10:30",
+   "title": "来週の【新規公開(IPO)銘柄】",
+   "media": "株探ニュース",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/8f16c912b7a74afea3e0e29e2344194d7cdf110f"
   },
   {
-   "at": "11/07 09:00",
-   "title": "NY金先物：反落、米雇用統計の上振れで利上げ観測強まりドル高が重し"
+   "at": "2026-11-07 10:20",
+   "title": "今週の【決算】見どころ　全チェック！　＜決算特集＞",
+   "media": "株探ニュース",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/a39f85cfd8210a6c8ee71c0b742531e0c89db858"
   },
   {
-   "at": "11/07 09:00",
-   "title": "今週の【上場来高値銘柄】寿スピリッツ、デイトナ、丸文など57銘柄"
+   "at": "2026-11-07 10:13",
+   "title": "〔海外決算〕欧州航空IAG、7～9月期は減益＝燃料コスト増が重荷",
+   "media": "時事通信",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/8528439642082bfb8dff65cb810c3316667084ee"
   },
   {
-   "at": "11/07 08:30",
-   "title": "週間ランキング【値上がり率】 (11月6日)"
+   "at": "2026-11-07 09:01",
+   "title": "NY債券：反落、イールドカーブは平坦化",
+   "media": "フィスコ",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/174b665955282f9f960c22050ea7efa8d2ed612e"
   },
   {
-   "at": "11/07 08:30",
-   "title": "週間ランキング【値下がり率】 (11月6日)"
+   "at": "2026-11-07 09:01",
+   "title": "NY原油先物：小幅続伸、米イラン紛争の不透明感くすぶり下値限定",
+   "media": "フィスコ",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/493d047a7a5e4814fbc25169ab08852f291b2675"
   },
   {
-   "at": "11/07 08:30",
-   "title": "週間ランキング【業種別　騰落率】 (11月6日)"
+   "at": "2026-11-07 09:00",
+   "title": "NY金先物：反落、米雇用統計の上振れで利上げ観測強まりドル高が重し",
+   "media": "フィスコ",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/f710fa41d6777229ccd2ec1ce6753daeb6c2f76b"
   },
   {
-   "at": "11/07 07:54",
-   "title": "米国市場データ　ＮＹダウは237ドル安と続落（11月6日）"
+   "at": "2026-11-07 08:30",
+   "title": "週間ランキング【業種別　騰落率】 (11月6日)",
+   "media": "株探ニュース",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/3f2e3adccb663209b47e3b8431a57299d87f6ab4"
   },
   {
-   "at": "11/07 07:45",
-   "title": "NY為替：米10月雇用統計で失業率が予想外に低下"
+   "at": "2026-11-07 06:40",
+   "title": "今週の【早わかり株式市況】急反落、AI規制への警戒感でハイテク株総崩れ",
+   "media": "株探ニュース",
+   "site": "Yahoo!ファイナンス",
+   "url": "https://finance.yahoo.co.jp/news/detail/70b125ab281aa5c91297b3d8d0a09efb3720be24"
   }
  ],
  "themes": [
