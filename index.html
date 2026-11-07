@@ -76,6 +76,7 @@
   .chips .n { color: var(--muted); margin-right: 4px; }
   .nd-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
   .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .h2-sub { font-size: 12px; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; margin-left: 8px; vertical-align: 3px; }
   .mv-list { margin: 0; padding: 0; list-style: none; display: grid; }
   .mv-row { display: grid; grid-template-columns: 1.6rem minmax(0, 1.6fr) 5.5rem minmax(6rem, 1fr) 9.5rem auto; gap: 4px 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
   .mv-row:last-child { border-bottom: 0; }
@@ -247,7 +248,7 @@
 
   <section class="section" id="movers" hidden>
     <div class="nd-top">
-      <h2>動きのいい銘柄</h2>
+      <h2>動きのいい銘柄<span class="h2-sub">東証プライム</span></h2>
       <div class="filters" role="group" aria-label="ランキングの種類" id="mv-tabs"></div>
     </div>
     <div class="card">

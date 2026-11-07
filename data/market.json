@@ -588,9 +588,9 @@
  "movers": {
   "up": {
    "label": "値上がり率",
-   "note": "前営業日に上がった率が大きい個別株（ETF・ETNを除く）",
-   "site": "Yahoo!ファイナンス 値上がり率ランキング",
-   "url": "https://finance.yahoo.co.jp/stocks/ranking/up?market=all",
+   "note": "前営業日に上がった率が大きい東証プライムの銘柄",
+   "site": "Yahoo!ファイナンス 値上がり率ランキング（東証プライム）",
+   "url": "https://finance.yahoo.co.jp/stocks/ranking/up?market=tokyo1",
    "rows": [
     {
      "rank": 1,
@@ -605,83 +605,6 @@
     },
     {
      "rank": 2,
-     "name": "(株)ＶＬＣセキュリティ",
-     "code": "2467",
-     "market": "名証NXT",
-     "price": 311.0,
-     "change": 45.0,
-     "pct": 16.92,
-     "volume": 1042100,
-     "url": "https://finance.yahoo.co.jp/quote/2467.N"
-    },
-    {
-     "rank": 3,
-     "name": "(株)ウェッジホールディングス",
-     "code": "2388",
-     "market": "東証GRT",
-     "price": 10.0,
-     "change": 1.0,
-     "pct": 11.11,
-     "volume": 1010500,
-     "url": "https://finance.yahoo.co.jp/quote/2388.T"
-    },
-    {
-     "rank": 4,
-     "name": "セントラルフォレストグループ(株)",
-     "code": "7675",
-     "market": "名証MN",
-     "price": 3200.0,
-     "change": 250.0,
-     "pct": 8.47,
-     "volume": 200,
-     "url": "https://finance.yahoo.co.jp/quote/7675.N"
-    },
-    {
-     "rank": 5,
-     "name": "アイビーシー(株)",
-     "code": "3920",
-     "market": "東証STD",
-     "price": 1328.0,
-     "change": 101.0,
-     "pct": 8.23,
-     "volume": 91300,
-     "url": "https://finance.yahoo.co.jp/quote/3920.T"
-    },
-    {
-     "rank": 6,
-     "name": "夢展望(株)",
-     "code": "3185",
-     "market": "東証GRT",
-     "price": 79.0,
-     "change": 6.0,
-     "pct": 8.22,
-     "volume": 9283600,
-     "url": "https://finance.yahoo.co.jp/quote/3185.T"
-    },
-    {
-     "rank": 7,
-     "name": "東京インキ(株)",
-     "code": "4635",
-     "market": "東証STD",
-     "price": 2076.0,
-     "change": 157.0,
-     "pct": 8.18,
-     "volume": 457900,
-     "url": "https://finance.yahoo.co.jp/quote/4635.T"
-    },
-    {
-     "rank": 8,
-     "name": "アクセルマーク(株)",
-     "code": "3624",
-     "market": "東証GRT",
-     "price": 29.0,
-     "change": 2.0,
-     "pct": 7.41,
-     "volume": 2255100,
-     "url": "https://finance.yahoo.co.jp/quote/3624.T"
-    },
-    {
-     "rank": 9,
      "name": "地主(株)",
      "code": "3252",
      "market": "東証PRM",
@@ -692,23 +615,100 @@
      "url": "https://finance.yahoo.co.jp/quote/3252.T"
     },
     {
+     "rank": 3,
+     "name": "理想科学工業(株)",
+     "code": "6413",
+     "market": "東証PRM",
+     "price": 1086.0,
+     "change": 36.0,
+     "pct": 3.43,
+     "volume": 180100,
+     "url": "https://finance.yahoo.co.jp/quote/6413.T"
+    },
+    {
+     "rank": 4,
+     "name": "日東紡",
+     "code": "3110",
+     "market": "東証PRM",
+     "price": 2399.5,
+     "change": 78.5,
+     "pct": 3.38,
+     "volume": 17316600,
+     "url": "https://finance.yahoo.co.jp/quote/3110.T"
+    },
+    {
+     "rank": 5,
+     "name": "(株)インターネットイニシアティブ",
+     "code": "3774",
+     "market": "東証PRM",
+     "price": 3607.0,
+     "change": 118.0,
+     "pct": 3.38,
+     "volume": 1547300,
+     "url": "https://finance.yahoo.co.jp/quote/3774.T"
+    },
+    {
+     "rank": 6,
+     "name": "ＺＡＣＲＯＳ(株)",
+     "code": "7917",
+     "market": "東証PRM",
+     "price": 1223.0,
+     "change": 33.0,
+     "pct": 2.77,
+     "volume": 472200,
+     "url": "https://finance.yahoo.co.jp/quote/7917.T"
+    },
+    {
+     "rank": 7,
+     "name": "グンゼ(株)",
+     "code": "3002",
+     "market": "東証PRM",
+     "price": 4240.0,
+     "change": 100.0,
+     "pct": 2.42,
+     "volume": 655400,
+     "url": "https://finance.yahoo.co.jp/quote/3002.T"
+    },
+    {
+     "rank": 8,
+     "name": "シスメックス(株)",
+     "code": "6869",
+     "market": "東証PRM",
+     "price": 2065.5,
+     "change": 48.5,
+     "pct": 2.4,
+     "volume": 8630400,
+     "url": "https://finance.yahoo.co.jp/quote/6869.T"
+    },
+    {
+     "rank": 9,
+     "name": "ピジョン(株)",
+     "code": "7956",
+     "market": "東証PRM",
+     "price": 2189.5,
+     "change": 43.0,
+     "pct": 2.0,
+     "volume": 3623900,
+     "url": "https://finance.yahoo.co.jp/quote/7956.T"
+    },
+    {
      "rank": 10,
-     "name": "データセクション(株)",
-     "code": "3905",
-     "market": "東証GRT",
-     "price": 1583.0,
-     "change": 101.0,
-     "pct": 6.82,
-     "volume": 31002400,
-     "url": "https://finance.yahoo.co.jp/quote/3905.T"
+     "name": "全国保証(株)",
+     "code": "7164",
+     "market": "東証PRM",
+     "price": 3191.0,
+     "change": 51.0,
+     "pct": 1.62,
+     "volume": 1248900,
+     "url": "https://finance.yahoo.co.jp/quote/7164.T"
     }
    ]
   },
   "down": {
    "label": "値下がり率",
-   "note": "前営業日に下がった率が大きい個別株（ETF・ETNを除く）",
-   "site": "Yahoo!ファイナンス 値下がり率ランキング",
-   "url": "https://finance.yahoo.co.jp/stocks/ranking/down?market=all",
+   "note": "前営業日に下がった率が大きい東証プライムの銘柄",
+   "site": "Yahoo!ファイナンス 値下がり率ランキング（東証プライム）",
+   "url": "https://finance.yahoo.co.jp/stocks/ranking/down?market=tokyo1",
    "rows": [
     {
      "rank": 1,
@@ -723,39 +723,6 @@
     },
     {
      "rank": 2,
-     "name": "(株)イメージ　ワン",
-     "code": "2667",
-     "market": "東証STD",
-     "price": 70.0,
-     "change": -23.0,
-     "pct": -24.73,
-     "volume": 4030400,
-     "url": "https://finance.yahoo.co.jp/quote/2667.T"
-    },
-    {
-     "rank": 3,
-     "name": "(株)ゼネテック",
-     "code": "4492",
-     "market": "東証STD",
-     "price": 261.0,
-     "change": -71.0,
-     "pct": -21.39,
-     "volume": 708400,
-     "url": "https://finance.yahoo.co.jp/quote/4492.T"
-    },
-    {
-     "rank": 4,
-     "name": "ＳＣＡＴ(株)",
-     "code": "3974",
-     "market": "東証STD",
-     "price": 558.0,
-     "change": -143.0,
-     "pct": -20.4,
-     "volume": 513000,
-     "url": "https://finance.yahoo.co.jp/quote/3974.T"
-    },
-    {
-     "rank": 5,
      "name": "ＪＴ",
      "code": "2914",
      "market": "東証PRM",
@@ -766,18 +733,7 @@
      "url": "https://finance.yahoo.co.jp/quote/2914.T"
     },
     {
-     "rank": 6,
-     "name": "(株)ギミック",
-     "code": "475A",
-     "market": "東証STD",
-     "price": 424.0,
-     "change": -96.0,
-     "pct": -18.46,
-     "volume": 135800,
-     "url": "https://finance.yahoo.co.jp/quote/475A.T"
-    },
-    {
-     "rank": 7,
+     "rank": 3,
      "name": "(株)日本エム・ディ・エム",
      "code": "7600",
      "market": "東証PRM",
@@ -788,45 +744,89 @@
      "url": "https://finance.yahoo.co.jp/quote/7600.T"
     },
     {
+     "rank": 4,
+     "name": "ローム(株)",
+     "code": "6963",
+     "market": "東証PRM",
+     "price": 2759.0,
+     "change": -487.0,
+     "pct": -15.0,
+     "volume": 21082000,
+     "url": "https://finance.yahoo.co.jp/quote/6963.T"
+    },
+    {
+     "rank": 5,
+     "name": "(株)ＦＯＯＤ　＆　ＬＩＦＥ　ＣＯＭＰＡＮＩＥＳ",
+     "code": "3563",
+     "market": "東証PRM",
+     "price": 5092.0,
+     "change": -875.0,
+     "pct": -14.66,
+     "volume": 8908800,
+     "url": "https://finance.yahoo.co.jp/quote/3563.T"
+    },
+    {
+     "rank": 6,
+     "name": "ＢＩＰＲＯＧＹ(株)",
+     "code": "8056",
+     "market": "東証PRM",
+     "price": 4337.0,
+     "change": -638.0,
+     "pct": -12.82,
+     "volume": 2310100,
+     "url": "https://finance.yahoo.co.jp/quote/8056.T"
+    },
+    {
+     "rank": 7,
+     "name": "味の素(株)",
+     "code": "2802",
+     "market": "東証PRM",
+     "price": 4268.0,
+     "change": -604.0,
+     "pct": -12.4,
+     "volume": 11561800,
+     "url": "https://finance.yahoo.co.jp/quote/2802.T"
+    },
+    {
      "rank": 8,
-     "name": "ＢＣＣ(株)",
-     "code": "7376",
-     "market": "東証GRT",
-     "price": 361.0,
-     "change": -77.0,
-     "pct": -17.58,
-     "volume": 221000,
-     "url": "https://finance.yahoo.co.jp/quote/7376.T"
+     "name": "(株)山形銀行",
+     "code": "8344",
+     "market": "東証PRM",
+     "price": 3775.0,
+     "change": -530.0,
+     "pct": -12.31,
+     "volume": 293800,
+     "url": "https://finance.yahoo.co.jp/quote/8344.T"
     },
     {
      "rank": 9,
-     "name": "(株)オートウェーブ",
-     "code": "2666",
-     "market": "東証STD",
-     "price": 154.0,
-     "change": -32.0,
-     "pct": -17.2,
-     "volume": 381400,
-     "url": "https://finance.yahoo.co.jp/quote/2666.T"
+     "name": "(株)ｇｕｍｉ",
+     "code": "3903",
+     "market": "東証PRM",
+     "price": 146.0,
+     "change": -20.0,
+     "pct": -12.05,
+     "volume": 1764600,
+     "url": "https://finance.yahoo.co.jp/quote/3903.T"
     },
     {
      "rank": 10,
-     "name": "タメニー(株)",
-     "code": "6181",
-     "market": "東証GRT",
-     "price": 62.0,
-     "change": -12.0,
-     "pct": -16.22,
-     "volume": 833500,
-     "url": "https://finance.yahoo.co.jp/quote/6181.T"
+     "name": "(株)ＡＩＲＭＡＮ",
+     "code": "6364",
+     "market": "東証PRM",
+     "price": 2015.0,
+     "change": -269.0,
+     "pct": -11.78,
+     "volume": 156900,
+     "url": "https://finance.yahoo.co.jp/quote/6364.T"
     }
    ]
   },
   "volume": {
    "label": "出来高（売買が多い）",
-   "note": "前営業日に売買された株数が多い個別株（ETF・ETNを除く）",
-   "site": "Yahoo!ファイナンス 出来高ランキング",
-   "url": "https://finance.yahoo.co.jp/stocks/ranking/volume?market=all",
+   "note": "前営業日に売買された株数が多い東証プライムの銘柄",
+   "site": "Yahoo!ファイナンス 出来高ランキング（東証プライム）",
+   "url": "https://finance.yahoo.co.jp/stocks/ranking/volume?market=tokyo1",
    "rows": [
     {
      "rank": 1,
@@ -841,17 +841,6 @@
     },
     {
      "rank": 2,
-     "name": "オンコセラピー・サイエンス(株)",
-     "code": "4564",
-     "market": "東証GRT",
-     "price": 16.0,
-     "change": -1.0,
-     "pct": -5.88,
-     "volume": 207919900,
-     "url": "https://finance.yahoo.co.jp/quote/4564.T"
-    },
-    {
-     "rank": 3,
      "name": "キオクシアホールディングス(株)",
      "code": "285A",
      "market": "東証PRM",
@@ -862,18 +851,7 @@
      "url": "https://finance.yahoo.co.jp/quote/285A.T"
     },
     {
-     "rank": 4,
-     "name": "(株)ランド",
-     "code": "8918",
-     "market": "東証STD",
-     "price": 9.0,
-     "change": 0.0,
-     "pct": 0.0,
-     "volume": 135705400,
-     "url": "https://finance.yahoo.co.jp/quote/8918.T"
-    },
-    {
-     "rank": 5,
+     "rank": 3,
      "name": "東京海上ホールディングス(株)",
      "code": "8766",
      "market": "東証PRM",
@@ -884,7 +862,7 @@
      "url": "https://finance.yahoo.co.jp/quote/8766.T"
     },
     {
-     "rank": 6,
+     "rank": 4,
      "name": "ソフトバンク(株)",
      "code": "9434",
      "market": "東証PRM",
@@ -895,7 +873,7 @@
      "url": "https://finance.yahoo.co.jp/quote/9434.T"
     },
     {
-     "rank": 7,
+     "rank": 5,
      "name": "ソニーフィナンシャルグループ(株)",
      "code": "8729",
      "market": "東証PRM",
@@ -906,18 +884,7 @@
      "url": "https://finance.yahoo.co.jp/quote/8729.T"
     },
     {
-     "rank": 8,
-     "name": "ソレイジア・ファーマ(株)",
-     "code": "4597",
-     "market": "東証GRT",
-     "price": 23.0,
-     "change": -1.0,
-     "pct": -4.17,
-     "volume": 88601000,
-     "url": "https://finance.yahoo.co.jp/quote/4597.T"
-    },
-    {
-     "rank": 9,
+     "rank": 6,
      "name": "三菱重工業(株)",
      "code": "7011",
      "market": "東証PRM",
@@ -928,7 +895,7 @@
      "url": "https://finance.yahoo.co.jp/quote/7011.T"
     },
     {
-     "rank": 10,
+     "rank": 7,
      "name": "ソフトバンクグループ(株)",
      "code": "9984",
      "market": "東証PRM",
@@ -937,12 +904,45 @@
      "pct": -10.83,
      "volume": 74507100,
      "url": "https://finance.yahoo.co.jp/quote/9984.T"
+    },
+    {
+     "rank": 8,
+     "name": "日産自動車(株)",
+     "code": "7201",
+     "market": "東証PRM",
+     "price": 269.7,
+     "change": -23.0,
+     "pct": -7.86,
+     "volume": 68228500,
+     "url": "https://finance.yahoo.co.jp/quote/7201.T"
+    },
+    {
+     "rank": 9,
+     "name": "日本製鉄(株)",
+     "code": "5401",
+     "market": "東証PRM",
+     "price": 656.5,
+     "change": -9.5,
+     "pct": -1.43,
+     "volume": 67790800,
+     "url": "https://finance.yahoo.co.jp/quote/5401.T"
+    },
+    {
+     "rank": 10,
+     "name": "トヨタ自動車(株)",
+     "code": "7203",
+     "market": "東証PRM",
+     "price": 3338.0,
+     "change": -195.0,
+     "pct": -5.52,
+     "volume": 66832800,
+     "url": "https://finance.yahoo.co.jp/quote/7203.T"
     }
    ]
   },
   "minkabu": {
    "label": "みんかぶ 買い予想",
-   "note": "みんかぶ会員の株価予想で「買い」が多い銘柄",
+   "note": "みんかぶ会員の株価予想で「買い」が多い銘柄のうち、東証プライムのもの",
    "site": "みんかぶ みんなの株価予想",
    "url": "https://minkabu.jp/",
    "rows": [
@@ -959,17 +959,6 @@
     },
     {
      "rank": 2,
-     "name": "ココナラ",
-     "code": "4176",
-     "market": "東証GRT",
-     "price": 257.0,
-     "change": -18.0,
-     "pct": -6.55,
-     "volume": null,
-     "url": "https://finance.yahoo.co.jp/quote/4176.T"
-    },
-    {
-     "rank": 3,
      "name": "太陽誘電",
      "code": "6976",
      "market": "東証PRM",
