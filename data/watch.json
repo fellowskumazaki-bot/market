@@ -30,9 +30,7 @@
    "analyst": "買い",
    "board_buy": 30,
    "board_sell": 38,
-   "next_event": "直近の決算発表は10/29",
-   "shares": null,
-   "cost": null
+   "next_event": "直近の決算発表は10/29"
   },
   {
    "code": "9984",
@@ -63,9 +61,7 @@
    "analyst": "買い",
    "board_buy": 47,
    "board_sell": 26,
-   "next_event": "決算発表 11/10（火）予定",
-   "shares": null,
-   "cost": null
+   "next_event": "決算発表 11/10（火）予定"
   },
   {
    "code": "9434",
@@ -96,9 +92,7 @@
    "analyst": "買い",
    "board_buy": 81,
    "board_sell": 6,
-   "next_event": "決算発表 11/9（月）予定",
-   "shares": null,
-   "cost": null
+   "next_event": "決算発表 11/9（月）予定"
   }
  ],
  "watch_points": [
