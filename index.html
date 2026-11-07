@@ -107,6 +107,9 @@
   .side-btn[aria-current="true"] .pc.up, .side-btn[aria-current="true"] .pc.down { color: inherit; }
   .side-btn .pc .arrow { font-size: 11px; margin-right: 2px; }
   .side-label { color: var(--muted); font-size: 12px; font-weight: 600; margin: 6px 2px 0; }
+  .side-genre { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--line); color: var(--fg); font-size: 13px; }
+  .side-genre-pc { font-size: 12px; font-weight: 400; }
+  .genre-row td { background: var(--bg); font-weight: 600; font-size: 13px; }
   .side-add { color: var(--muted); font-size: 12px; margin: 6px 2px 0; line-height: 1.5; }
   .hero { display: grid; gap: 6px; }
   .hero-top { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
@@ -401,6 +404,16 @@
   document.getElementById('finder-q').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); findStock(this.value); } });
   renderRecent();
 
+  // 業種（ジャンル）ごとにまとめる。並び順は銘柄リストで最初に出てきた順。
+  function groups(list) {
+    var out = [], idx = {};
+    list.forEach(function (r) {
+      var s = r.sector || 'その他';
+      if (!(s in idx)) { idx[s] = out.length; out.push({ sector: s, rows: [] }); }
+      out[idx[s]].rows.push(r);
+    });
+    return out;
+  }
   function renderPortfolio() { renderSide(state.watch); renderView(state.watch); renderNewsdesk(state.watch); renderCompany(state.watch); }
   function pick(code) {
     state.code = code;
@@ -425,9 +438,15 @@
       b.addEventListener('click', function () { pick(code); });
       return b;
     }
-    box.appendChild(button('', '全体の比較', list.length + ' 銘柄'));
-    box.appendChild(el('div', 'side-label', '銘柄ごとに分析'));
-    list.forEach(function (r) { box.appendChild(button(r.code, shortName(r.name), r.code + '・' + num(r.price) + ' 円', r.pct)); });
+    box.appendChild(button('', '全体の比較', list.length + ' 銘柄・' + groups(list).length + ' 業種'));
+    groups(list).forEach(function (g) {
+      var lab = el('div', 'side-label side-genre');
+      lab.appendChild(el('span', '', g.sector));
+      var avg = g.rows.reduce(function (s, r) { return s + (r.pct || 0); }, 0) / g.rows.length;
+      lab.appendChild(tone(el('span', 'side-genre-pc', '平均 ' + pct(avg)), avg));
+      box.appendChild(lab);
+      g.rows.forEach(function (r) { box.appendChild(button(r.code, shortName(r.name), r.code + '・' + num(r.price) + ' 円', r.pct)); });
+    });
     box.appendChild(el('p', 'side-add', '銘柄を増やすときは、Claudeに「〇〇を追加して」と伝えてください。'));
     var cur = box.querySelector('[aria-current="true"]');
     if (cur && window.innerWidth <= 780) box.scrollLeft = Math.max(0, cur.offsetLeft - 16);
@@ -482,7 +501,14 @@
       var hr = el('tr'); cols.forEach(function (c) { hr.appendChild(el('th', c[1] || '', c[0])); });
       var th = el('thead'); th.appendChild(hr); t2.appendChild(th);
       var tb = el('tbody');
-      list.forEach(function (r) {
+      var ordered = [];
+      groups(list).forEach(function (g) {
+        var gr = el('tr', 'genre-row'); var gtd = el('td', '', g.sector + '（' + g.rows.length + '銘柄）'); gtd.colSpan = cols.length; gr.appendChild(gtd); tb.appendChild(gr);
+        g.rows.forEach(function (r) { ordered.push(r); tb.appendChild(cmpRow(r)); });
+      });
+      t2.appendChild(tb);
+      return;
+      function cmpRow(r) {
         var tr = el('tr', 'cmp-row'); tr.tabIndex = 0;
         tr.addEventListener('click', function () { pick(r.code); });
         tr.addEventListener('keydown', function (e) { if (e.key === 'Enter') pick(r.code); });
@@ -492,10 +518,8 @@
           [r.pbr == null ? '—' : num(r.pbr) + '倍', 'r'], [r.next_event || '—', 'dim']].forEach(function (c) {
           var td = el('td', c[1] || '', c[0]); if (c.length > 2) tone(td, c[2]); tr.appendChild(td);
         });
-        tb.appendChild(tr);
-      });
-      t2.appendChild(tb);
-      return;
+        return tr;
+      }
     }
     var r = list.filter(function (x) { return x.code === state.code; })[0];
     if (!r) return;
