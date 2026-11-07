@@ -270,6 +270,10 @@
   .breadth { display: flex; flex-wrap: wrap; gap: 16px; }
   .msg { padding: 12px 16px; border-radius: var(--r); border: 1px solid var(--line); background: var(--panel); }
   .msg.err { border-color: var(--down); }
+  .lock p { margin: 0 0 10px; }
+  .lock-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .lock-row input { flex: 1 1 180px; min-width: 0; font-size: 16px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line, #ccc); background: var(--bg); color: var(--fg); }
+  .lock-msg { color: var(--down); margin: 8px 0 0 !important; }
   details { color: var(--muted); font-size: 13px; }
   details summary { cursor: pointer; }
   details dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 8px 0 0; }
@@ -334,6 +338,35 @@
   .mv-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; align-items: baseline; }
   .mv-meta .breadth { font-size: 13px; gap: 12px; }
 
+  .breadth-mk { font-size: 12px; color: var(--muted); }
+  .breadth-mk.is-all { color: var(--warn); }
+  .breadth-item { text-decoration: none; color: var(--fg); }
+  .cell-sub { display: none; font-size: 11px; color: var(--muted); font-weight: 400; }
+  #funds-table td { white-space: normal; }
+  #funds-table td.r { white-space: nowrap; }
+  #sched-more { margin-top: 8px; }
+  .hist { gap: 12px; }
+  .hist-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .hist-sum div { display: grid; min-width: 0; }
+  .hist-sum b { font-family: var(--serif); font-weight: 400; font-size: 20px; white-space: nowrap; }
+  .hist-chart svg { display: block; width: 100%; height: auto; }
+  .hist-chart text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+  .hist-chart text.end { fill: var(--fg); font-weight: 600; }
+  .hist-table td, .hist-table th { padding: 5px 8px; }
+  .hold-ed { gap: 10px; }
+  .hold-rows { display: grid; gap: 6px; }
+  .hold-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: center; }
+  .hold-head span { font-size: 12px; color: var(--muted); }
+  .hold-name { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hold-row input, .hold-text { font: inherit; font-size: 16px; width: 100%; min-width: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); }
+  .hold-row input:focus-visible, .hold-text:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .hold-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .hold-msg { margin: 0; font-size: 13px; color: var(--muted); }
+  .hold-msg:empty { display: none; }
+  .hold-move { display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .hold-move > summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+  .hold-move[open] { gap: 8px; }
+  .hold-text { font-family: ui-monospace, Menlo, monospace; font-size: 12px; resize: vertical; }
   /* ---- 予定 ---- */
   .sched { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
   .sched li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; }
@@ -353,6 +386,9 @@
     .cmp-table { display: none; }
     .cmp-cards { display: grid; }
     .hide-sm { display: none; }
+    .cell-sub { display: block; }
+    .hist-sum { grid-template-columns: 1fr 1fr; }
+    .hist-sum b { font-size: 17px; }
     .hold { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .tot { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
     .tot b { font-size: 17px; line-height: 1.3; }
@@ -388,6 +424,11 @@
   </nav>
 
   <div id="error" class="msg err" hidden></div>
+  <form id="lock" class="msg lock" hidden>
+    <p><b>合い言葉を入れてください。</b>このページのデータは暗号化してあり、合い言葉を知っている人だけが読めます。一度入れると、この端末が覚えます。</p>
+    <div class="lock-row"><input id="lock-pass" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="合い言葉" aria-label="合い言葉"><button type="submit" class="btn">開く</button></div>
+    <p id="lock-msg" class="lock-msg" hidden>合い言葉がちがいます。もう一度入れてください。</p>
+  </form>
 
   <section class="tiles anchor" id="tiles" aria-label="主な指標"></section>
 
@@ -461,7 +502,7 @@
 
   <section class="section anchor" id="schedule">
     <h2>今後の予定</h2>
-    <div class="card"><ul class="sched" id="events"></ul></div>
+    <div class="card"><p class="note" id="sched-note">今日から14日以内の予定です。保有銘柄の予定は日付に関係なく表示します。</p><ul class="sched" id="events"></ul></div>
   </section>
 
   <section class="section anchor" id="funds">
@@ -478,7 +519,7 @@
     <dl>
       <dt>出典</dt><dd>Yahoo!ファイナンス、日経225先物リアルタイム、みんかぶに表示されていた内容を、Claudeが読み込んでまとめています。通常は平日8時・12時・16時に自動で更新し、手動で更新したときはその時刻のデータになります。</dd>
       <dt>指数比</dt><dd>先物価格から前営業日の日経平均終値を引いた差です。</dd>
-      <dt>保有の損益</dt><dd>評価額＝株価×保有株数、含み損益＝（株価−取得単価）×保有株数、今日の損益＝前日比×保有株数で計算しています。手数料や税金は含みません。</dd>
+      <dt>保有の損益</dt><dd>評価額＝株価×保有株数、含み損益＝（株価−取得単価）×保有株数、今日の損益＝前日比×保有株数で計算しています。手数料や税金は含みません。保有株数と取得単価は、入力したブラウザの中だけに保存され、インターネットには送られません。</dd>
       <dt>要約</dt><dd>「保有銘柄のニュース」の文章と会社の事業内容はClaudeが各サイトの内容を要約したものです。</dd>
       <dt>ご注意</dt><dd>個人用のまとめで、売買を勧めるものではありません。みんかぶの情報は利用規約により再配布が禁止されているため、このページのリンクは人に送らないでください。</dd>
     </dl>
@@ -521,10 +562,91 @@
   try { state.tab = localStorage.getItem('mk-tab') || 'an'; } catch (e) {}
   // ---- 設定：動きのいい銘柄の絞り込み条件（ここだけ変えれば全体に反映） ----
   var MOVER_FILTER = { minVolume: 50000, minPrice: 100, show: 10 };
+  // ポートフォリオの「前営業日の値動き」グラフは、この数以上の銘柄があるときだけ出す
+  var MOVES_CHART_MIN = 5;
+  // 「今後の予定」で最初に見せる日数（保有銘柄の予定はこれより先でも表示）
+  var SCHEDULE_DAYS = 14;
+
+  // ---- 保有株数・取得単価：このブラウザの中だけに保存（ネットには送らない） ----
+  var HOLD_KEY = 'mk-holdings';
+  function loadHold() { try { var v = JSON.parse(localStorage.getItem(HOLD_KEY) || '{}'); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } }
+  function saveHold(h) { try { localStorage.setItem(HOLD_KEY, JSON.stringify(h)); return true; } catch (e) { return false; } }
+  var HOLD = loadHold();
+  var holdOpen = false;
+  function toNum(s) { var n = Number(String(s == null ? '' : s).replace(/[,，\s円株]/g, '').replace(/[０-９．]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); })); return isFinite(n) ? n : NaN; }
+  function packHold(h) { return 'MKH1:' + btoa(unescape(encodeURIComponent(JSON.stringify(h)))); }
+  function unpackHold(t) {
+    t = String(t || '').trim(); if (t.indexOf('MKH1:') !== 0) throw new Error('形式が違います');
+    var v = JSON.parse(decodeURIComponent(escape(atob(t.slice(5))))); if (!v || typeof v !== 'object') throw new Error('中身が読めません');
+    var out = {}; Object.keys(v).forEach(function (k) { var s = Number(v[k].shares), c = Number(v[k].cost); if (s > 0 && c > 0) out[k] = { shares: s, cost: c }; });
+    return out;
+  }
+  function holdChanged() { renderHeader(state.market); renderPortfolio(); }
+
+  function holdEditor(list) {
+    var d = el('details', 'card hold-ed'); d.id = 'hold-editor'; d.open = holdOpen || !Object.keys(HOLD).length;
+    d.addEventListener('toggle', function () { holdOpen = d.open; });
+    d.appendChild(el('summary', '', '保有株数・取得単価を入力（このブラウザだけに保存）'));
+    d.appendChild(el('p', 'note', '入れた数字はこの端末のこのブラウザの中だけに保存され、インターネットには送られません。持っていない銘柄は空のままにしてください。スマホとパソコンなど、別の端末では下の「別の端末に移す」を使います。'));
+    var tbl = el('div', 'hold-rows');
+    var head = el('div', 'hold-row hold-head'); ['銘柄', '保有株数', '取得単価（1株・円）'].forEach(function (t) { head.appendChild(el('span', '', t)); }); tbl.appendChild(head);
+    var inputs = {};
+    list.forEach(function (r) {
+      var row = el('div', 'hold-row'); var h = HOLD[r.code] || {};
+      row.appendChild(el('span', 'hold-name', shortName(r.name)));
+      var s = el('input'); s.type = 'text'; s.inputMode = 'numeric'; s.id = 'hold-sh-' + r.code; s.placeholder = '例 100'; s.value = h.shares || ''; s.setAttribute('aria-label', shortName(r.name) + 'の保有株数');
+      var c = el('input'); c.type = 'text'; c.inputMode = 'decimal'; c.id = 'hold-co-' + r.code; c.placeholder = '例 6800'; c.value = h.cost || ''; c.setAttribute('aria-label', shortName(r.name) + 'の取得単価');
+      row.appendChild(s); row.appendChild(c); tbl.appendChild(row); inputs[r.code] = [s, c];
+    });
+    d.appendChild(tbl);
+    var msg = el('p', 'hold-msg'); msg.setAttribute('aria-live', 'polite');
+    var bar = el('div', 'hold-bar');
+    var save = el('button', 'btn', '保存する'); save.type = 'button';
+    save.addEventListener('click', function () {
+      var next = {}, bad = [];
+      Object.keys(inputs).forEach(function (code) {
+        var sv = inputs[code][0].value.trim(), cv = inputs[code][1].value.trim();
+        if (!sv && !cv) return;
+        var s = toNum(sv), c = toNum(cv);
+        if (!(s > 0) || !(c > 0)) { bad.push(code); return; }
+        next[code] = { shares: s, cost: c };
+      });
+      if (bad.length) { msg.textContent = '株数と取得単価は、両方とも0より大きい数字で入れてください（' + bad.join('・') + '）。'; return; }
+      HOLD = next; holdOpen = true;
+      msg.textContent = saveHold(HOLD) ? '保存しました。' : 'このブラウザでは保存できませんでした（プライベートブラウズなど）。表示は閉じるまで反映されます。';
+      holdChanged();
+    });
+    var clr = el('button', 'pill', 'すべて消す'); clr.type = 'button';
+    clr.addEventListener('click', function () {
+      if (clr.getAttribute('data-sure') !== '1') { clr.setAttribute('data-sure', '1'); clr.textContent = 'もう一度押すと消えます'; return; }
+      HOLD = {}; saveHold(HOLD); holdOpen = true; holdChanged();
+    });
+    bar.appendChild(save); bar.appendChild(clr); d.appendChild(bar); d.appendChild(msg);
+
+    var mv = el('details', 'hold-move');
+    mv.appendChild(el('summary', '', '別の端末に移す'));
+    mv.appendChild(el('p', 'note', '① 入力した端末で「移す用の文字を作る」を押してコピー → ② 自分あてのメモなどで別の端末に送る → ③ 別の端末でこのページを開き、下の欄に貼り付けて「読み込む」。この文字には保有の数字が入っているので、人には送らないでください。'));
+    var mk = el('button', 'pill', '移す用の文字を作る'); mk.type = 'button';
+    var out = el('textarea', 'hold-text'); out.readOnly = true; out.rows = 2; out.hidden = true; out.id = 'hold-export';
+    mk.addEventListener('click', function () {
+      out.value = packHold(HOLD); out.hidden = false; out.select();
+      if (navigator.clipboard) navigator.clipboard.writeText(out.value).then(function () { mk.textContent = 'コピーしました'; }, function () { mk.textContent = '下の文字を選んでコピーしてください'; });
+    });
+    var inp = el('textarea', 'hold-text'); inp.rows = 2; inp.placeholder = 'ここに「MKH1:」で始まる文字を貼り付け'; inp.id = 'hold-import';
+    var ld = el('button', 'pill', '読み込む'); ld.type = 'button';
+    var mmsg = el('p', 'hold-msg');
+    ld.addEventListener('click', function () {
+      try { HOLD = unpackHold(inp.value); saveHold(HOLD); holdOpen = true; holdChanged(); }
+      catch (e) { mmsg.textContent = '読み込めませんでした。「MKH1:」から最後まで、全部コピーできているか確かめてください。'; }
+    });
+    mv.appendChild(mk); mv.appendChild(out); mv.appendChild(inp); mv.appendChild(ld); mv.appendChild(mmsg);
+    d.appendChild(mv);
+    return d;
+  }
 
   // ---- 保有の損益 ----
   function holding(r) {
-    var sh = Number(r.shares), cost = Number(r.cost);
+    var hv = HOLD[r.code] || {}; var sh = Number(hv.shares), cost = Number(hv.cost);
     if (!(sh > 0) || !(cost > 0) || typeof r.price !== 'number') return null;
     return { shares: sh, cost: cost, value: r.price * sh, pl: (r.price - cost) * sh, plPct: (r.price / cost - 1) * 100,
       today: typeof r.change === 'number' ? r.change * sh : null };
@@ -582,9 +704,11 @@
       items.push({ d: d, text: shortName(r.name) + '：' + s.replace(/\s*予定$/, ''), mine: true, code: r.code });
     });
     items = items.filter(function (x) { return x.d >= today; }).sort(function (a, b) { return a.d - b.d; });
+    var hiddenN = 0;
     items.forEach(function (x) {
       var days = Math.round((x.d - today) / 86400000);
       var li = el('li', x.mine ? 'mine' : '');
+      if (days > SCHEDULE_DAYS && !x.mine) { li.hidden = true; li.setAttribute('data-later', '1'); hiddenN++; }
       li.appendChild(el('span', 'd', (x.d.getMonth() + 1) + '/' + x.d.getDate() + '（' + '日月火水木金土'.charAt(x.d.getDay()) + '）'));
       var t = el('span', ''); if (x.mine) t.appendChild(el('span', 'tag-mine', '保有')); t.appendChild(document.createTextNode(x.text)); li.appendChild(t);
       li.appendChild(el('span', 'left' + (days <= 3 ? ' soon' : ''), days === 0 ? '今日' : 'あと' + days + '日'));
@@ -592,6 +716,49 @@
       ul.appendChild(li);
     });
     if (!items.length) ul.appendChild(el('li', '', 'これからの予定はありません。'));
+    var old = document.getElementById('sched-more'); if (old) old.remove();
+    if (hiddenN) {
+      var b = el('button', 'more-btn', SCHEDULE_DAYS + '日より先の予定を見る（' + hiddenN + '件）'); b.type = 'button'; b.id = 'sched-more';
+      b.addEventListener('click', function () { ul.querySelectorAll('[data-later]').forEach(function (li) { li.hidden = false; }); b.remove(); });
+      ul.parentNode.appendChild(b);
+    }
+  }
+
+  // ---- 過去1か月の株価 ----
+  function histRows(w, code) {
+    var ph = ((w && w.price_history) || []).filter(function (x) { return x.code === code; })[0];
+    return ph && ph.rows ? ph.rows.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }) : [];
+  }
+  function monthChange(w, code) {
+    var rows = histRows(w, code); if (rows.length < 2) return null;
+    return ratio(rows[rows.length - 1].close, rows[0].close);
+  }
+  function drawHist(box, rows) {
+    var NS = 'http://www.w3.org/2000/svg';
+    var W = Math.max(280, box.clientWidth || 600), H = 190, L = 8, R = 64, T = 14, B = 26;
+    var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', '過去1か月の終値の推移'); box.appendChild(svg);
+    var vals = rows.map(function (x) { return x.close; });
+    var lo = Math.min.apply(null, rows.map(function (x) { return x.low; })), hi = Math.max.apply(null, rows.map(function (x) { return x.high; }));
+    var pad = (hi - lo) * 0.08 || 1; lo -= pad; hi += pad;
+    function x(i) { return L + i / Math.max(1, rows.length - 1) * (W - L - R); }
+    function y(v) { return T + (hi - v) / (hi - lo) * (H - T - B); }
+    function mk(tag, attrs) { var n = document.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); svg.appendChild(n); return n; }
+    [0, 0.5, 1].forEach(function (f) {
+      var v = hi - (hi - lo) * f;
+      mk('line', { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: 'var(--line)' });
+      var t = mk('text', { x: W - R + 6, y: y(v) + 4, 'class': 'ax' }); t.textContent = nf.format(Math.round(v * 10) / 10);
+    });
+    var up = vals[vals.length - 1] >= vals[0];
+    var color = up ? 'var(--up)' : 'var(--down)';
+    var d = vals.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+    mk('path', { d: d + ' L' + x(vals.length - 1).toFixed(1) + ' ' + (H - B) + ' L' + x(0).toFixed(1) + ' ' + (H - B) + ' Z', fill: color, 'fill-opacity': '0.10', stroke: 'none' });
+    mk('path', { d: d, fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
+    var lx = x(vals.length - 1), ly = y(vals[vals.length - 1]);
+    mk('circle', { cx: lx, cy: ly, r: 4, fill: color });
+    var lt = mk('text', { x: lx + 6, y: ly + 4, 'class': 'end' }); lt.textContent = nf.format(vals[vals.length - 1]);
+    var t1 = mk('text', { x: L, y: H - 6, 'class': 'ax' }); t1.textContent = shortDate(rows[0].date);
+    var t2 = mk('text', { x: W - R, y: H - 6, 'class': 'ax', 'text-anchor': 'end' }); t2.textContent = shortDate(rows[rows.length - 1].date);
   }
 
   // ---- 先物：主要2市場 ----
@@ -765,6 +932,8 @@
         if (tt.n < list.length) c0.appendChild(el('p', 'note', '保有株数と取得単価が入っている銘柄だけを合計しています。'));
         box.appendChild(c0);
       }
+      box.appendChild(holdEditor(list));
+      if (list.length >= MOVES_CHART_MIN) {
       var c1 = card('前営業日の値動き（騰落率）');
       var maxAbs = Math.max.apply(null, list.map(function (r) { return Math.abs(r.pct || 0); }).concat([1]));
       var bars = el('div', 'divbars');
@@ -779,12 +948,13 @@
         ax.appendChild(s); ax.appendChild(t); row.appendChild(ax); bars.appendChild(row);
       });
       c1.appendChild(bars); box.appendChild(c1);
+      }
 
       var c2 = card('銘柄の比較');
       c2.appendChild(el('p', 'note', '押すと、その銘柄の分析に切り替わります。「高値から」は年初来高値と比べた下落率、「目標まで」はみんかぶの目標株価までの差です。'));
       // PC：表
       var sc = el('div', 'scroll cmp-table'); var t2 = el('table'); sc.appendChild(t2); c2.appendChild(sc);
-      var cols = [['銘柄'], ['株価', 'r'], ['騰落率', 'r'], ['夜間PTS', 'r']];
+      var cols = [['銘柄'], ['株価', 'r'], ['騰落率', 'r'], ['夜間PTS', 'r'], ['1か月', 'r']];
       if (anyHold) cols = cols.concat([['評価額', 'r'], ['含み損益', 'r']]);
       cols = cols.concat([['高値から', 'r'], ['目標まで', 'r'], ['配当利回り', 'r'], ['PER', 'r'], ['PBR', 'r'], ['次の予定']]);
       var hr = el('tr'); cols.forEach(function (c) { hr.appendChild(el('th', c[1] || '', c[0])); });
@@ -806,7 +976,8 @@
         tr.addEventListener('click', function () { pick(r.code); });
         tr.addEventListener('keydown', function (e) { if (e.key === 'Enter') pick(r.code); });
         var fromHigh = ratio(r.price, r.ytd_high), toTarget = ratio(r.target, r.price), h = holding(r);
-        var cells = [[shortName(r.name)], [num(r.price), 'r'], [pct(r.pct), 'r', r.pct], [pct(r.pts_pct), 'r', r.pts_pct]];
+        var m1 = monthChange(w, r.code);
+        var cells = [[shortName(r.name)], [num(r.price), 'r'], [pct(r.pct), 'r', r.pct], [pct(r.pts_pct), 'r', r.pts_pct], [m1 === null ? '—' : pct(m1), 'r', m1]];
         if (anyHold) cells = cells.concat([[h ? yenPlain(h.value) : '—', 'r'], [h ? yen(h.pl) + '（' + pct(h.plPct) + '）' : '—', 'r', h ? h.pl : null]]);
         cells = cells.concat([[fromHigh === null ? '—' : pct(fromHigh), 'r', fromHigh],
           [toTarget === null ? '—' : pct(toTarget), 'r', toTarget], [r.yield == null ? '—' : num(r.yield) + '%', 'r'], [r.per == null ? '—' : num(r.per) + '倍', 'r'],
@@ -821,7 +992,8 @@
         var pr = el('span', ''); pr.appendChild(document.createTextNode(num(r.price) + ' 円 ')); pr.appendChild(tone(el('b', '', pct(r.pct)), r.pct)); r1.appendChild(pr);
         b.appendChild(r1);
         var dl = el('dl'); var toTarget = ratio(r.target, r.price), h = holding(r);
-        var items = [['夜間PTS', pct(r.pts_pct), r.pts_pct], ['目標まで', toTarget === null ? '—' : pct(toTarget), toTarget], ['配当利回り', r.yield == null ? '—' : num(r.yield) + '%', null]];
+        var m1c = monthChange(w, r.code);
+        var items = [['夜間PTS', pct(r.pts_pct), r.pts_pct], ['1か月', m1c === null ? '—' : pct(m1c), m1c], ['目標まで', toTarget === null ? '—' : pct(toTarget), toTarget], ['配当利回り', r.yield == null ? '—' : num(r.yield) + '%', null]];
         if (h) items = [['評価額', yenPlain(h.value), null], ['含み損益', yen(h.pl), h.pl], ['今日', yen(h.today), h.today]].concat(items);
         items.forEach(function (x) { var d = el('div'); d.appendChild(el('dt', '', x[0])); d.appendChild(tone(el('dd', '', x[1]), x[2])); dl.appendChild(d); });
         b.appendChild(dl);
@@ -864,6 +1036,11 @@
     });
     hero.appendChild(strip);
     var hh = holding(r);
+    if (!hh) {
+      var hb = el('button', 'more-btn', 'この銘柄の保有株数・取得単価を入れる'); hb.type = 'button';
+      hb.addEventListener('click', function () { holdOpen = true; pick(''); var f = document.getElementById('hold-sh-' + r.code); if (f) { document.getElementById('hold-editor').scrollIntoView(); f.focus(); } });
+      hero.appendChild(hb);
+    }
     if (hh) {
       var hd = el('dl', 'hold');
       [['保有', nf.format(hh.shares) + '株（取得 ' + num(hh.cost) + '円）', null], ['評価額', yenPlain(hh.value), null], ['含み損益', yen(hh.pl) + '（' + pct(hh.plPct) + '）', hh.pl], ['今日の損益', yen(hh.today), hh.today]].forEach(function (x) {
@@ -875,6 +1052,8 @@
     // ひと目でわかるポイント
     var chips = el('ul', 'dt-points');
     function chip(text, v, good) { var li = el('li', 'dt-chip ' + (good === true ? 'is-up' : good === false ? 'is-down' : ''), text); chips.appendChild(li); }
+    var m1h = monthChange(w, r.code);
+    if (m1h !== null) chip('この1か月 ' + pct(m1h), m1h, m1h > 0);
     if (fromHigh !== null) chip('年初来高値から ' + pct(fromHigh), fromHigh, fromHigh > -5 ? true : fromHigh < -15 ? false : null);
     if (toT !== null) chip('目標株価まで ' + pct(toT), toT, toT > 0);
     if (buy || sell) chip(buy >= sell ? '掲示板は買いたい派が多い（' + buy + '%）' : '掲示板は売りたい派が多い（' + sell + '%）', null, buy >= sell);
@@ -885,7 +1064,7 @@
     box.appendChild(hero);
 
     // 2) タブ：分析／ニュース／会社情報
-    var TABS = [['an', '分析'], ['news', 'ニュースと要点（' + (news.length + pts.length) + '）'], ['co', '会社情報']];
+    var TABS = [['an', '分析'], ['hist', '過去1か月'], ['news', 'ニュースと要点（' + (news.length + pts.length) + '）'], ['co', '会社情報']];
     if (TABS.every(function (t) { return t[0] !== state.tab; })) state.tab = 'an';
     var tabs = el('div', 'dt-tabs'); tabs.setAttribute('role', 'tablist');
     TABS.forEach(function (t) {
@@ -940,6 +1119,49 @@
       });
       a4.appendChild(k); g.appendChild(a4);
       panel.appendChild(g);
+    } else if (state.tab === 'hist') {
+      var hcard = el('div', 'card hist');
+      var hrows = histRows(w, r.code);
+      if (!hrows.length) {
+        hcard.appendChild(el('p', 'note', '過去1か月のデータはまだありません。次の自動更新で集めます。'));
+      } else {
+        var first = hrows[0], last = hrows[hrows.length - 1];
+        var mchg = ratio(last.close, first.close);
+        var hiR = hrows.reduce(function (m, x) { return x.high > m.high ? x : m; });
+        var loR = hrows.reduce(function (m, x) { return x.low < m.low ? x : m; });
+        var avgV = hrows.reduce(function (s, x) { return s + (x.volume || 0); }, 0) / hrows.length;
+        var sumEl = el('div', 'hist-sum');
+        [['この1か月（' + shortDate(first.date) + '→' + shortDate(last.date) + '）', pct(mchg), mchg],
+          ['期間の高値', num(hiR.high) + '円（' + shortDate(hiR.date) + '）', null],
+          ['期間の安値', num(loR.low) + '円（' + shortDate(loR.date) + '）', null],
+          ['平均出来高', nf.format(Math.round(avgV)) + '株', null]].forEach(function (x) {
+          var d = el('div'); d.appendChild(el('span', 'sub', x[0])); d.appendChild(tone(el('b', '', x[1]), x[2])); sumEl.appendChild(d);
+        });
+        hcard.appendChild(sumEl);
+        var chartBox = el('div', 'hist-chart'); hcard.appendChild(chartBox);
+        var hs = el('div', 'scroll'); var ht2 = el('table', 'hist-table'); hs.appendChild(ht2); hcard.appendChild(hs);
+        var hh2 = el('tr'); [['日付'], ['終値', 'r'], ['前日比', 'r'], ['高値', 'r hide-sm'], ['安値', 'r hide-sm'], ['出来高', 'r hide-sm']].forEach(function (c) { hh2.appendChild(el('th', c[1] || '', c[0])); });
+        var hth = el('thead'); hth.appendChild(hh2); ht2.appendChild(hth);
+        var htb = el('tbody');
+        hrows.slice().reverse().forEach(function (x, i, arr) {
+          var prev = arr[i + 1]; var dc = prev ? ratio(x.close, prev.close) : null;
+          var tr = el('tr');
+          var dd = new Date(x.date + 'T00:00:00');
+          tr.appendChild(el('td', 'dim', shortDate(x.date) + '（' + '日月火水木金土'.charAt(dd.getDay()) + '）'));
+          tr.appendChild(el('td', 'r', num(x.close)));
+          tr.appendChild(tone(el('td', 'r', dc === null ? '—' : pct(dc)), dc));
+          tr.appendChild(el('td', 'r hide-sm', num(x.high)));
+          tr.appendChild(el('td', 'r hide-sm', num(x.low)));
+          tr.appendChild(el('td', 'r hide-sm', nf.format(x.volume)));
+          htb.appendChild(tr);
+        });
+        ht2.appendChild(htb);
+        var phs = (w.price_history || []).filter(function (x) { return x.code === r.code; })[0];
+        hcard.appendChild(srcLine(phs && phs.site || 'Yahoo!ファイナンス 時系列', null, phs && phs.url, null, '出典', '時系列のページを開く'));
+        panel.appendChild(hcard);
+        drawHist(chartBox, hrows);
+      }
+      if (!hrows.length) panel.appendChild(hcard);
     } else if (state.tab === 'news') {
       var nc = el('div', 'card');
       var cf = el('div', 'filters');
@@ -1018,6 +1240,7 @@
       cols.forEach(function (c) {
         var v = row[c.f];
         var td = el('td', (c.r ? 'r ' : '') + (c.dim ? 'dim ' : '') + (c.hs ? 'hide-sm' : ''), c.fmt ? c.fmt(v, row) : (v === null || v === undefined ? '—' : String(v)));
+        if (c.sub && row[c.sub]) td.appendChild(el('span', 'cell-sub', String(row[c.sub]).replace(/\s*終値$/, '終値').replace(/^(\d{2}\/\d{2})\s+/, '$1 ')));
         if (c.tone) tone(td, v);
         r.appendChild(td);
       });
@@ -1181,8 +1404,8 @@
 
   function renderFutures(m) {
     var rows = m.futures || [];
-    table('fut-table', [{ label: '市場', f: 'name' }, { label: '価格', f: 'price', r: 1, fmt: num }, { label: '前日比', f: 'change', r: 1, fmt: sgn, tone: 1 },
-      { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 }, { label: '時刻', f: 'at', dim: 1 }], rows);
+    table('fut-table', [{ label: '市場', f: 'name' }, { label: '価格', f: 'price', r: 1, fmt: num, sub: 'at' }, { label: '前日比', f: 'change', r: 1, fmt: sgn, tone: 1, hs: 1 },
+      { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 }, { label: '時刻', f: 'at', dim: 1, hs: 1 }], rows);
     var box = clear(document.getElementById('fut-chart'));
     if (!rows.length) return;
     var NS = 'http://www.w3.org/2000/svg';
@@ -1221,11 +1444,17 @@
   }
 
   function renderRest(m) {
-    table('world-table', [{ label: '銘柄', f: 'name' }, { label: '区分', f: 'group', dim: 1, hs: 1 }, { label: '値', f: 'value', r: 1, fmt: num },
+    table('world-table', [{ label: '銘柄', f: 'name' }, { label: '区分', f: 'group', dim: 1, hs: 1 }, { label: '値', f: 'value', r: 1, fmt: num, sub: 'at' },
       { label: '前日比', f: 'change', r: 1, fmt: sgn, tone: 1, hs: 1 }, { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 },
       { label: '時刻', f: 'at', dim: 1, hs: 1 }, { label: '出典', f: 'site', dim: 1, hs: 1 }], m.indices || []);
     var br = clear(document.getElementById('breadth'));
-    (m.breadth || []).forEach(function (b) { var s = el('span', '', b.side + ' '); s.appendChild(tone(el('b', '', num(b.companies)), b.side === '値上がり' ? 1 : -1)); s.appendChild(document.createTextNode(' 社')); br.appendChild(s); });
+    var bmk = (m.breadth || []).map(function (b) { return b.market; }).filter(Boolean)[0];
+    if ((m.breadth || []).length) br.appendChild(el('span', 'breadth-mk' + (bmk ? '' : ' is-all'), bmk ? bmk + '：' : '全市場（東証プライム以外も含む）：'));
+    (m.breadth || []).forEach(function (b) {
+      var s = el(b.url ? 'a' : 'span', 'breadth-item', b.side + ' ');
+      if (b.url) { s.href = b.url; s.target = '_blank'; s.rel = 'noopener noreferrer'; }
+      s.appendChild(tone(el('b', '', num(b.companies)), b.side === '値上がり' ? 1 : -1)); s.appendChild(document.createTextNode(' 社')); br.appendChild(s);
+    });
     var tp = clear(document.getElementById('topics'));
     function titleEl(title, url) {
       if (!url) return el('span', '', title);
@@ -1248,8 +1477,8 @@
     var th = clear(document.getElementById('themes'));
     (m.themes || []).forEach(function (t) { var li = el('li'); li.appendChild(el('span', 'n', t.rank)); li.appendChild(document.createTextNode(t.name)); th.appendChild(li); });
     renderSchedule(m, state.watch);
-    table('funds-table', [{ label: 'ランキング', f: 'category', dim: 1 }, { label: '順位', f: 'rank', dim: 1 }, { label: 'ファンド', f: 'name' },
-      { label: '値', f: 'value', r: 1, fmt: function (v, row) { return row.unit === '%' ? pct(v) : num(v); } }, { label: '単位', f: 'unit', dim: 1 }], m.funds || []);
+    table('funds-table', [{ label: 'ランキング', f: 'category', dim: 1, hs: 1 }, { label: '順位', f: 'rank', dim: 1 }, { label: 'ファンド', f: 'name', sub: 'category' },
+      { label: '値', f: 'value', r: 1, fmt: function (v, row) { return row.unit === '%' ? pct(v) : num(v) + (row.unit ? ' ' + row.unit : ''); } }], m.funds || []);
   }
 
   // 動きのいい銘柄：各サイトのランキングから集めたもの
@@ -1308,23 +1537,93 @@
     renderFilters(); renderPortfolio();
   }
 
-  function getJSON(path) {
+  // 公開サイトのデータは暗号化してある（data/*.enc.json）。合い言葉はこの端末の中だけに覚える。
+  var PASS_KEY = 'mk-pass', memPass = null;
+  function readPass() {
+    var m = location.hash.match(/[#&]k=([^&]+)/);
+    if (m) {
+      var p = decodeURIComponent(m[1]);
+      try { localStorage.setItem(PASS_KEY, p); } catch (e) {}
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+      return p;
+    }
+    try { return localStorage.getItem(PASS_KEY) || memPass; } catch (e) { return memPass; }
+  }
+  function b64(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  var keyCache = {};
+  function deriveKeys(pass, salt, iter) {
+    var id = pass + '|' + salt + '|' + iter;
+    if (!keyCache[id]) {
+      var cs = crypto.subtle;
+      keyCache[id] = cs.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveBits']).then(function (k) {
+        return cs.deriveBits({ name: 'PBKDF2', salt: b64(salt), iterations: iter, hash: 'SHA-256' }, k, 512);
+      }).then(function (bits) {
+        return Promise.all([
+          cs.importKey('raw', bits.slice(0, 32), { name: 'AES-CBC' }, false, ['decrypt']),
+          cs.importKey('raw', bits.slice(32, 64), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify'])
+        ]);
+      });
+    }
+    return keyCache[id];
+  }
+  function lockError(wrong) { var e = new Error('合い言葉が必要です'); e.lock = true; e.wrong = !!wrong; return e; }
+  function decryptBox(box, pass) {
+    if (!window.crypto || !crypto.subtle) return Promise.reject(new Error('このブラウザでは暗号を戻せません'));
+    var iv = b64(box.iv), ct = b64(box.ct), signed = new Uint8Array(iv.length + ct.length);
+    signed.set(iv, 0); signed.set(ct, iv.length);
+    return deriveKeys(pass, box.salt, box.iter).then(function (k) {
+      return crypto.subtle.verify('HMAC', k[1], b64(box.mac), signed).then(function (ok) {
+        if (!ok) throw lockError(true);
+        return crypto.subtle.decrypt({ name: 'AES-CBC', iv: iv }, k[0], ct);
+      });
+    }).then(function (buf) { return JSON.parse(new TextDecoder().decode(buf)); });
+  }
+  function fetchJSON(path) {
     return fetch(path + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) {
-      if (!r.ok) throw new Error(path + ' を読み込めませんでした（' + r.status + '）');
+      if (!r.ok) { var e = new Error(path + ' を読み込めませんでした（' + r.status + '）'); e.status = r.status; throw e; }
       return r.json();
+    });
+  }
+  function getJSON(path) {
+    // Macで開く版（株ポートフォリオアプリ.html）はデータを埋め込んで持っている
+    if (window.__MK_DATA__ && window.__MK_DATA__[path]) return Promise.resolve(JSON.parse(JSON.stringify(window.__MK_DATA__[path])));
+    return fetchJSON(path.replace(/\.json$/, '.enc.json')).then(function (box) {
+      var pass = readPass();
+      if (!pass) throw lockError(false);
+      return decryptBox(box, pass);
+    }, function (e) {
+      if (e.status === 404) return fetchJSON(path);
+      throw e;
     });
   }
 
   var btn = document.getElementById('reload');
+  var lock = document.getElementById('lock');
   function load() {
     btn.disabled = true; btn.textContent = '更新中…';
     var err = document.getElementById('error');
     Promise.all([getJSON('data/market.json'), getJSON('data/watch.json')]).then(function (res) {
-      state.market = res[0]; state.watch = res[1]; err.hidden = true; render();
+      state.market = res[0]; state.watch = res[1]; err.hidden = true; lock.hidden = true; render();
     }).catch(function (e) {
+      if (e.lock) {
+        err.hidden = true; lock.hidden = false;
+        document.getElementById('lock-msg').hidden = !e.wrong;
+        if (e.wrong) { memPass = null; try { localStorage.removeItem(PASS_KEY); } catch (x) {} }
+        document.getElementById('lede').textContent = '合い言葉を入れると表示されます。';
+        return;
+      }
       err.hidden = false; err.textContent = 'データを読み込めませんでした。通信状態を確かめて、もう一度「最新の情報に更新」を押してください。（' + e.message + '）';
     }).then(function () { btn.disabled = false; btn.textContent = '最新の情報に更新'; });
   }
+  lock.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var v = document.getElementById('lock-pass').value.trim();
+    if (!v) return;
+    memPass = v;
+    try { localStorage.setItem(PASS_KEY, v); } catch (e) {}
+    document.getElementById('lock-pass').value = '';
+    load();
+  });
   btn.addEventListener('click', load);
   if (window.innerWidth > 780) document.querySelectorAll('details[data-open-wide]').forEach(function (d) { d.open = true; });
   var fm = document.querySelector('.fut-more'); if (fm) fm.addEventListener('toggle', function () { if (fm.open && state.market) renderFutures(state.market); });
