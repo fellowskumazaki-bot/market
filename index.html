@@ -349,20 +349,6 @@
   .hist-chart text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
   .hist-chart text.end { fill: var(--fg); font-weight: 600; }
   .hist-table td, .hist-table th { padding: 5px 8px; }
-  .hold-ed { gap: 10px; }
-  .hold-rows { display: grid; gap: 6px; }
-  .hold-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: center; }
-  .hold-head span { font-size: 12px; color: var(--muted); }
-  .hold-name { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .hold-row input, .hold-text { font: inherit; font-size: 16px; width: 100%; min-width: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); }
-  .hold-row input:focus-visible, .hold-text:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .hold-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .hold-msg { margin: 0; font-size: 13px; color: var(--muted); }
-  .hold-msg:empty { display: none; }
-  .hold-move { display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
-  .hold-move > summary { cursor: pointer; font-size: 14px; font-weight: 600; }
-  .hold-move[open] { gap: 8px; }
-  .hold-text { font-family: ui-monospace, Menlo, monospace; font-size: 12px; resize: vertical; }
   /* ---- 予定 ---- */
   .sched { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
   .sched li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; }
@@ -510,7 +496,7 @@
     <dl>
       <dt>出典</dt><dd>Yahoo!ファイナンス、日経225先物リアルタイム、みんかぶに表示されていた内容を、Claudeが読み込んでまとめています。通常は平日8時・12時・16時に自動で更新し、手動で更新したときはその時刻のデータになります。</dd>
       <dt>指数比</dt><dd>先物価格から前営業日の日経平均終値を引いた差です。</dd>
-      <dt>保有の損益</dt><dd>評価額＝株価×保有株数、含み損益＝（株価−取得単価）×保有株数、今日の損益＝前日比×保有株数で計算しています。手数料や税金は含みません。保有株数と取得単価は、入力したブラウザの中だけに保存され、インターネットには送られません。</dd>
+      <dt>保有の損益</dt><dd>評価額＝株価×保有株数、含み損益＝（株価−取得単価）×保有株数、今日の損益＝前日比×保有株数で計算しています。手数料や税金は含みません。</dd>
       <dt>要約</dt><dd>「保有銘柄のニュース」の文章と会社の事業内容はClaudeが各サイトの内容を要約したものです。</dd>
       <dt>ご注意</dt><dd>個人用のまとめで、売買を勧めるものではありません。みんかぶの情報は利用規約により再配布が禁止されているため、このページのリンクは人に送らないでください。</dd>
     </dl>
@@ -558,86 +544,9 @@
   // 「今後の予定」で最初に見せる日数（保有銘柄の予定はこれより先でも表示）
   var SCHEDULE_DAYS = 14;
 
-  // ---- 保有株数・取得単価：このブラウザの中だけに保存（ネットには送らない） ----
-  var HOLD_KEY = 'mk-holdings';
-  function loadHold() { try { var v = JSON.parse(localStorage.getItem(HOLD_KEY) || '{}'); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } }
-  function saveHold(h) { try { localStorage.setItem(HOLD_KEY, JSON.stringify(h)); return true; } catch (e) { return false; } }
-  var HOLD = loadHold();
-  var holdOpen = false;
-  function toNum(s) { var n = Number(String(s == null ? '' : s).replace(/[,，\s円株]/g, '').replace(/[０-９．]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); })); return isFinite(n) ? n : NaN; }
-  function packHold(h) { return 'MKH1:' + btoa(unescape(encodeURIComponent(JSON.stringify(h)))); }
-  function unpackHold(t) {
-    t = String(t || '').trim(); if (t.indexOf('MKH1:') !== 0) throw new Error('形式が違います');
-    var v = JSON.parse(decodeURIComponent(escape(atob(t.slice(5))))); if (!v || typeof v !== 'object') throw new Error('中身が読めません');
-    var out = {}; Object.keys(v).forEach(function (k) { var s = Number(v[k].shares), c = Number(v[k].cost); if (s > 0 && c > 0) out[k] = { shares: s, cost: c }; });
-    return out;
-  }
-  function holdChanged() { renderHeader(state.market); renderPortfolio(); }
-
-  function holdEditor(list) {
-    var d = el('details', 'card hold-ed'); d.id = 'hold-editor'; d.open = holdOpen || !Object.keys(HOLD).length;
-    d.addEventListener('toggle', function () { holdOpen = d.open; });
-    d.appendChild(el('summary', '', '保有株数・取得単価を入力（このブラウザだけに保存）'));
-    d.appendChild(el('p', 'note', '入れた数字はこの端末のこのブラウザの中だけに保存され、インターネットには送られません。持っていない銘柄は空のままにしてください。スマホとパソコンなど、別の端末では下の「別の端末に移す」を使います。'));
-    var tbl = el('div', 'hold-rows');
-    var head = el('div', 'hold-row hold-head'); ['銘柄', '保有株数', '取得単価（1株・円）'].forEach(function (t) { head.appendChild(el('span', '', t)); }); tbl.appendChild(head);
-    var inputs = {};
-    list.forEach(function (r) {
-      var row = el('div', 'hold-row'); var h = HOLD[r.code] || {};
-      row.appendChild(el('span', 'hold-name', shortName(r.name)));
-      var s = el('input'); s.type = 'text'; s.inputMode = 'numeric'; s.id = 'hold-sh-' + r.code; s.placeholder = '例 100'; s.value = h.shares || ''; s.setAttribute('aria-label', shortName(r.name) + 'の保有株数');
-      var c = el('input'); c.type = 'text'; c.inputMode = 'decimal'; c.id = 'hold-co-' + r.code; c.placeholder = '例 6800'; c.value = h.cost || ''; c.setAttribute('aria-label', shortName(r.name) + 'の取得単価');
-      row.appendChild(s); row.appendChild(c); tbl.appendChild(row); inputs[r.code] = [s, c];
-    });
-    d.appendChild(tbl);
-    var msg = el('p', 'hold-msg'); msg.setAttribute('aria-live', 'polite');
-    var bar = el('div', 'hold-bar');
-    var save = el('button', 'btn', '保存する'); save.type = 'button';
-    save.addEventListener('click', function () {
-      var next = {}, bad = [];
-      Object.keys(inputs).forEach(function (code) {
-        var sv = inputs[code][0].value.trim(), cv = inputs[code][1].value.trim();
-        if (!sv && !cv) return;
-        var s = toNum(sv), c = toNum(cv);
-        if (!(s > 0) || !(c > 0)) { bad.push(code); return; }
-        next[code] = { shares: s, cost: c };
-      });
-      if (bad.length) { msg.textContent = '株数と取得単価は、両方とも0より大きい数字で入れてください（' + bad.join('・') + '）。'; return; }
-      HOLD = next; holdOpen = true;
-      msg.textContent = saveHold(HOLD) ? '保存しました。' : 'このブラウザでは保存できませんでした（プライベートブラウズなど）。表示は閉じるまで反映されます。';
-      holdChanged();
-    });
-    var clr = el('button', 'pill', 'すべて消す'); clr.type = 'button';
-    clr.addEventListener('click', function () {
-      if (clr.getAttribute('data-sure') !== '1') { clr.setAttribute('data-sure', '1'); clr.textContent = 'もう一度押すと消えます'; return; }
-      HOLD = {}; saveHold(HOLD); holdOpen = true; holdChanged();
-    });
-    bar.appendChild(save); bar.appendChild(clr); d.appendChild(bar); d.appendChild(msg);
-
-    var mv = el('details', 'hold-move');
-    mv.appendChild(el('summary', '', '別の端末に移す'));
-    mv.appendChild(el('p', 'note', '① 入力した端末で「移す用の文字を作る」を押してコピー → ② 自分あてのメモなどで別の端末に送る → ③ 別の端末でこのページを開き、下の欄に貼り付けて「読み込む」。この文字には保有の数字が入っているので、人には送らないでください。'));
-    var mk = el('button', 'pill', '移す用の文字を作る'); mk.type = 'button';
-    var out = el('textarea', 'hold-text'); out.readOnly = true; out.rows = 2; out.hidden = true; out.id = 'hold-export';
-    mk.addEventListener('click', function () {
-      out.value = packHold(HOLD); out.hidden = false; out.select();
-      if (navigator.clipboard) navigator.clipboard.writeText(out.value).then(function () { mk.textContent = 'コピーしました'; }, function () { mk.textContent = '下の文字を選んでコピーしてください'; });
-    });
-    var inp = el('textarea', 'hold-text'); inp.rows = 2; inp.placeholder = 'ここに「MKH1:」で始まる文字を貼り付け'; inp.id = 'hold-import';
-    var ld = el('button', 'pill', '読み込む'); ld.type = 'button';
-    var mmsg = el('p', 'hold-msg');
-    ld.addEventListener('click', function () {
-      try { HOLD = unpackHold(inp.value); saveHold(HOLD); holdOpen = true; holdChanged(); }
-      catch (e) { mmsg.textContent = '読み込めませんでした。「MKH1:」から最後まで、全部コピーできているか確かめてください。'; }
-    });
-    mv.appendChild(mk); mv.appendChild(out); mv.appendChild(inp); mv.appendChild(ld); mv.appendChild(mmsg);
-    d.appendChild(mv);
-    return d;
-  }
-
   // ---- 保有の損益 ----
   function holding(r) {
-    var hv = HOLD[r.code] || {}; var sh = Number(hv.shares), cost = Number(hv.cost);
+    var sh = Number(r.shares), cost = Number(r.cost);
     if (!(sh > 0) || !(cost > 0) || typeof r.price !== 'number') return null;
     return { shares: sh, cost: cost, value: r.price * sh, pl: (r.price - cost) * sh, plPct: (r.price / cost - 1) * 100,
       today: typeof r.change === 'number' ? r.change * sh : null };
@@ -923,7 +832,6 @@
         if (tt.n < list.length) c0.appendChild(el('p', 'note', '保有株数と取得単価が入っている銘柄だけを合計しています。'));
         box.appendChild(c0);
       }
-      box.appendChild(holdEditor(list));
       if (list.length >= MOVES_CHART_MIN) {
       var c1 = card('前営業日の値動き（騰落率）');
       var maxAbs = Math.max.apply(null, list.map(function (r) { return Math.abs(r.pct || 0); }).concat([1]));
@@ -1027,11 +935,6 @@
     });
     hero.appendChild(strip);
     var hh = holding(r);
-    if (!hh) {
-      var hb = el('button', 'more-btn', 'この銘柄の保有株数・取得単価を入れる'); hb.type = 'button';
-      hb.addEventListener('click', function () { holdOpen = true; pick(''); var f = document.getElementById('hold-sh-' + r.code); if (f) { document.getElementById('hold-editor').scrollIntoView(); f.focus(); } });
-      hero.appendChild(hb);
-    }
     if (hh) {
       var hd = el('dl', 'hold');
       [['保有', nf.format(hh.shares) + '株（取得 ' + num(hh.cost) + '円）', null], ['評価額', yenPlain(hh.value), null], ['含み損益', yen(hh.pl) + '（' + pct(hh.plPct) + '）', hh.pl], ['今日の損益', yen(hh.today), hh.today]].forEach(function (x) {
