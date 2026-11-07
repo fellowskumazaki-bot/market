@@ -76,6 +76,22 @@
   .chips .n { color: var(--muted); margin-right: 4px; }
   .nd-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
   .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .finder { gap: 8px; }
+  .finder-lab { font-weight: 600; font-size: 15px; }
+  .finder-row { display: flex; gap: 8px; }
+  .finder-row input { flex: 1 1 auto; min-width: 0; font: inherit; font-size: 16px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--fg); }
+  .finder-row input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .finder-out { display: grid; gap: 8px; }
+  .finder-out:empty, .finder-recent:empty { display: none; }
+  .finder-head { font-size: 14px; }
+  .finder-head b { font-weight: 600; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .link-btn { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 14px; background: var(--bg); color: var(--fg); }
+  .link-btn:hover { border-color: var(--fg); }
+  .link-btn.main { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .link-btn::after { content: "↗"; font-size: 11px; opacity: .7; }
+  .link-btn.in::after { content: ""; }
+  .finder-recent { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
   .pf { display: grid; grid-template-columns: 15.5rem minmax(0, 1fr); gap: 18px; align-items: start; }
   .pf-side { position: sticky; top: 12px; display: grid; gap: 6px; }
   .pf-main { display: grid; gap: 16px; min-width: 0; }
@@ -195,6 +211,15 @@
 
   <section class="section" id="portfolio">
     <h2>ポートフォリオ</h2>
+    <div class="card finder" id="finder">
+      <label class="finder-lab" for="finder-q">会社をさがす</label>
+      <div class="finder-row">
+        <input id="finder-q" type="search" inputmode="search" autocomplete="off" placeholder="会社名か証券コード（例：トヨタ、7203）" enterkeyhint="search">
+        <button type="button" class="btn" id="finder-go">さがす</button>
+      </div>
+      <div id="finder-out" class="finder-out" aria-live="polite"></div>
+      <div id="finder-recent" class="finder-recent"></div>
+    </div>
     <div class="pf">
       <nav class="pf-side" aria-label="銘柄を選ぶ" id="pf-side"></nav>
       <div class="pf-main">
@@ -295,6 +320,63 @@
   state.code = codeFromHash();
   function picked(rows) { return state.code ? rows.filter(function (r) { return r.code === state.code; }) : rows; }
   function shortName(n) { return String(n).replace(/（.*?）/g, ''); }
+  // 会社をさがす: このページは他のサイトから直接データを取れないため、各サイトの該当ページへのボタンを出す。
+  var RECENT_KEY = 'mk-recent';
+  function loadRecent() { try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch (e) { return []; } }
+  function saveRecent(q) {
+    var list = loadRecent().filter(function (x) { return x !== q; }); list.unshift(q); list = list.slice(0, 8);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function linkBtn(text, href, main) { var a = el('a', 'link-btn' + (main ? ' main' : ''), text); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; }
+  function findStock(q) {
+    var out = clear(document.getElementById('finder-out'));
+    q = String(q || '').replace(/[０-９Ａ-Ｚａ-ｚ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).trim();
+    if (!q) { renderRecent(); return; }
+    var codeM = q.toUpperCase().match(/^(\d{3}[0-9A-Z])(\.T)?$/);
+    var list = (state.watch && state.watch.watch) || [];
+    var mine = list.filter(function (r) { return codeM ? r.code === codeM[1] : shortName(r.name).indexOf(q) >= 0 || String(r.name).indexOf(q) >= 0; });
+    var links = el('div', 'links');
+    if (codeM) {
+      var c = codeM[1];
+      out.appendChild(el('div', 'finder-head', '証券コード ' + c + ' の会社を各サイトで見る'));
+      links.appendChild(linkBtn('株価・チャート（Yahoo!ファイナンス）', 'https://finance.yahoo.co.jp/quote/' + c + '.T', true));
+      links.appendChild(linkBtn('ニュース', 'https://finance.yahoo.co.jp/quote/' + c + '.T/news'));
+      links.appendChild(linkBtn('決算・業績', 'https://finance.yahoo.co.jp/quote/' + c + '.T/performance'));
+      links.appendChild(linkBtn('会社情報', 'https://finance.yahoo.co.jp/quote/' + c + '.T/profile'));
+      links.appendChild(linkBtn('予想・目標株価（みんかぶ）', 'https://minkabu.jp/stock/' + c));
+      links.appendChild(linkBtn('株探', 'https://kabutan.jp/stock/?code=' + c));
+    } else {
+      out.appendChild(el('div', 'finder-head', '「' + q + '」をさがす'));
+      links.appendChild(linkBtn('Yahoo!ファイナンスで検索', 'https://finance.yahoo.co.jp/search/?query=' + encodeURIComponent(q), true));
+      out.appendChild(el('p', 'note', '証券コード（4けた）がわかれば、コードで入れると株価・ニュース・決算・予想のページに直接行けます。'));
+    }
+    if (mine.length) {
+      var head = el('div', 'finder-head'); head.appendChild(el('b', '', 'ポートフォリオにある銘柄：')); out.appendChild(head);
+      var ml = el('div', 'links');
+      mine.forEach(function (r) {
+        var b = el('button', 'link-btn main in', shortName(r.name) + 'の分析を見る'); b.type = 'button';
+        b.addEventListener('click', function () { pick(r.code); });
+        ml.appendChild(b);
+      });
+      out.appendChild(ml);
+    }
+    out.insertBefore(links, out.children[1] || null);
+    saveRecent(q); renderRecent();
+  }
+  function renderRecent() {
+    var box = clear(document.getElementById('finder-recent'));
+    var list = loadRecent(); if (!list.length) return;
+    box.appendChild(document.createTextNode('最近さがした：'));
+    list.forEach(function (q) {
+      var b = el('button', 'pill', q); b.type = 'button';
+      b.addEventListener('click', function () { document.getElementById('finder-q').value = q; findStock(q); });
+      box.appendChild(b);
+    });
+  }
+  document.getElementById('finder-go').addEventListener('click', function () { findStock(document.getElementById('finder-q').value); });
+  document.getElementById('finder-q').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); findStock(this.value); } });
+  renderRecent();
+
   function renderPortfolio() { renderSide(state.watch); renderView(state.watch); renderNewsdesk(state.watch); renderCompany(state.watch); }
   function pick(code) {
     state.code = code;
