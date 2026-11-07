@@ -334,13 +334,6 @@
   .mv-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; align-items: baseline; }
   .mv-meta .breadth { font-size: 13px; gap: 12px; }
 
-  .breadth-mk { font-size: 12px; color: var(--muted); }
-  .breadth-mk.is-all { color: var(--warn); }
-  .breadth-item { text-decoration: none; color: var(--fg); }
-  .cell-sub { display: none; font-size: 11px; color: var(--muted); font-weight: 400; }
-  #funds-table td { white-space: normal; }
-  #funds-table td.r { white-space: nowrap; }
-  #sched-more { margin-top: 8px; }
   /* ---- 予定 ---- */
   .sched { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
   .sched li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; }
@@ -360,7 +353,6 @@
     .cmp-table { display: none; }
     .cmp-cards { display: grid; }
     .hide-sm { display: none; }
-    .cell-sub { display: block; }
     .hold { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .tot { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
     .tot b { font-size: 17px; line-height: 1.3; }
@@ -469,7 +461,7 @@
 
   <section class="section anchor" id="schedule">
     <h2>今後の予定</h2>
-    <div class="card"><p class="note" id="sched-note">今日から14日以内の予定です。保有銘柄の予定は日付に関係なく表示します。</p><ul class="sched" id="events"></ul></div>
+    <div class="card"><ul class="sched" id="events"></ul></div>
   </section>
 
   <section class="section anchor" id="funds">
@@ -529,10 +521,6 @@
   try { state.tab = localStorage.getItem('mk-tab') || 'an'; } catch (e) {}
   // ---- 設定：動きのいい銘柄の絞り込み条件（ここだけ変えれば全体に反映） ----
   var MOVER_FILTER = { minVolume: 50000, minPrice: 100, show: 10 };
-  // ポートフォリオの「前営業日の値動き」グラフは、この数以上の銘柄があるときだけ出す
-  var MOVES_CHART_MIN = 5;
-  // 「今後の予定」で最初に見せる日数（保有銘柄の予定はこれより先でも表示）
-  var SCHEDULE_DAYS = 14;
 
   // ---- 保有の損益 ----
   function holding(r) {
@@ -594,11 +582,9 @@
       items.push({ d: d, text: shortName(r.name) + '：' + s.replace(/\s*予定$/, ''), mine: true, code: r.code });
     });
     items = items.filter(function (x) { return x.d >= today; }).sort(function (a, b) { return a.d - b.d; });
-    var hiddenN = 0;
     items.forEach(function (x) {
       var days = Math.round((x.d - today) / 86400000);
       var li = el('li', x.mine ? 'mine' : '');
-      if (days > SCHEDULE_DAYS && !x.mine) { li.hidden = true; li.setAttribute('data-later', '1'); hiddenN++; }
       li.appendChild(el('span', 'd', (x.d.getMonth() + 1) + '/' + x.d.getDate() + '（' + '日月火水木金土'.charAt(x.d.getDay()) + '）'));
       var t = el('span', ''); if (x.mine) t.appendChild(el('span', 'tag-mine', '保有')); t.appendChild(document.createTextNode(x.text)); li.appendChild(t);
       li.appendChild(el('span', 'left' + (days <= 3 ? ' soon' : ''), days === 0 ? '今日' : 'あと' + days + '日'));
@@ -606,12 +592,6 @@
       ul.appendChild(li);
     });
     if (!items.length) ul.appendChild(el('li', '', 'これからの予定はありません。'));
-    var old = document.getElementById('sched-more'); if (old) old.remove();
-    if (hiddenN) {
-      var b = el('button', 'more-btn', SCHEDULE_DAYS + '日より先の予定を見る（' + hiddenN + '件）'); b.type = 'button'; b.id = 'sched-more';
-      b.addEventListener('click', function () { ul.querySelectorAll('[data-later]').forEach(function (li) { li.hidden = false; }); b.remove(); });
-      ul.parentNode.appendChild(b);
-    }
   }
 
   // ---- 先物：主要2市場 ----
@@ -785,7 +765,6 @@
         if (tt.n < list.length) c0.appendChild(el('p', 'note', '保有株数と取得単価が入っている銘柄だけを合計しています。'));
         box.appendChild(c0);
       }
-      if (list.length >= MOVES_CHART_MIN) {
       var c1 = card('前営業日の値動き（騰落率）');
       var maxAbs = Math.max.apply(null, list.map(function (r) { return Math.abs(r.pct || 0); }).concat([1]));
       var bars = el('div', 'divbars');
@@ -800,7 +779,6 @@
         ax.appendChild(s); ax.appendChild(t); row.appendChild(ax); bars.appendChild(row);
       });
       c1.appendChild(bars); box.appendChild(c1);
-      }
 
       var c2 = card('銘柄の比較');
       c2.appendChild(el('p', 'note', '押すと、その銘柄の分析に切り替わります。「高値から」は年初来高値と比べた下落率、「目標まで」はみんかぶの目標株価までの差です。'));
@@ -1040,7 +1018,6 @@
       cols.forEach(function (c) {
         var v = row[c.f];
         var td = el('td', (c.r ? 'r ' : '') + (c.dim ? 'dim ' : '') + (c.hs ? 'hide-sm' : ''), c.fmt ? c.fmt(v, row) : (v === null || v === undefined ? '—' : String(v)));
-        if (c.sub && row[c.sub]) td.appendChild(el('span', 'cell-sub', String(row[c.sub]).replace(/\s*終値$/, '終値').replace(/^(\d{2}\/\d{2})\s+/, '$1 ')));
         if (c.tone) tone(td, v);
         r.appendChild(td);
       });
@@ -1204,8 +1181,8 @@
 
   function renderFutures(m) {
     var rows = m.futures || [];
-    table('fut-table', [{ label: '市場', f: 'name' }, { label: '価格', f: 'price', r: 1, fmt: num, sub: 'at' }, { label: '前日比', f: 'change', r: 1, fmt: sgn, tone: 1, hs: 1 },
-      { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 }, { label: '時刻', f: 'at', dim: 1, hs: 1 }], rows);
+    table('fut-table', [{ label: '市場', f: 'name' }, { label: '価格', f: 'price', r: 1, fmt: num }, { label: '前日比', f: 'change', r: 1, fmt: sgn, tone: 1 },
+      { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 }, { label: '時刻', f: 'at', dim: 1 }], rows);
     var box = clear(document.getElementById('fut-chart'));
     if (!rows.length) return;
     var NS = 'http://www.w3.org/2000/svg';
@@ -1244,17 +1221,11 @@
   }
 
   function renderRest(m) {
-    table('world-table', [{ label: '銘柄', f: 'name' }, { label: '区分', f: 'group', dim: 1, hs: 1 }, { label: '値', f: 'value', r: 1, fmt: num, sub: 'at' },
+    table('world-table', [{ label: '銘柄', f: 'name' }, { label: '区分', f: 'group', dim: 1, hs: 1 }, { label: '値', f: 'value', r: 1, fmt: num },
       { label: '前日比', f: 'change', r: 1, fmt: sgn, tone: 1, hs: 1 }, { label: '騰落率', f: 'pct', r: 1, fmt: pct, tone: 1 },
       { label: '時刻', f: 'at', dim: 1, hs: 1 }, { label: '出典', f: 'site', dim: 1, hs: 1 }], m.indices || []);
     var br = clear(document.getElementById('breadth'));
-    var bmk = (m.breadth || []).map(function (b) { return b.market; }).filter(Boolean)[0];
-    if ((m.breadth || []).length) br.appendChild(el('span', 'breadth-mk' + (bmk ? '' : ' is-all'), bmk ? bmk + '：' : '全市場（東証プライム以外も含む）：'));
-    (m.breadth || []).forEach(function (b) {
-      var s = el(b.url ? 'a' : 'span', 'breadth-item', b.side + ' ');
-      if (b.url) { s.href = b.url; s.target = '_blank'; s.rel = 'noopener noreferrer'; }
-      s.appendChild(tone(el('b', '', num(b.companies)), b.side === '値上がり' ? 1 : -1)); s.appendChild(document.createTextNode(' 社')); br.appendChild(s);
-    });
+    (m.breadth || []).forEach(function (b) { var s = el('span', '', b.side + ' '); s.appendChild(tone(el('b', '', num(b.companies)), b.side === '値上がり' ? 1 : -1)); s.appendChild(document.createTextNode(' 社')); br.appendChild(s); });
     var tp = clear(document.getElementById('topics'));
     function titleEl(title, url) {
       if (!url) return el('span', '', title);
@@ -1277,8 +1248,8 @@
     var th = clear(document.getElementById('themes'));
     (m.themes || []).forEach(function (t) { var li = el('li'); li.appendChild(el('span', 'n', t.rank)); li.appendChild(document.createTextNode(t.name)); th.appendChild(li); });
     renderSchedule(m, state.watch);
-    table('funds-table', [{ label: 'ランキング', f: 'category', dim: 1, hs: 1 }, { label: '順位', f: 'rank', dim: 1 }, { label: 'ファンド', f: 'name', sub: 'category' },
-      { label: '値', f: 'value', r: 1, fmt: function (v, row) { return row.unit === '%' ? pct(v) : num(v) + (row.unit ? ' ' + row.unit : ''); } }], m.funds || []);
+    table('funds-table', [{ label: 'ランキング', f: 'category', dim: 1 }, { label: '順位', f: 'rank', dim: 1 }, { label: 'ファンド', f: 'name' },
+      { label: '値', f: 'value', r: 1, fmt: function (v, row) { return row.unit === '%' ? pct(v) : num(v); } }, { label: '単位', f: 'unit', dim: 1 }], m.funds || []);
   }
 
   // 動きのいい銘柄：各サイトのランキングから集めたもの
