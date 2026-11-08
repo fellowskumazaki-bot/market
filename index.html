@@ -1607,7 +1607,7 @@
     hold.sort(function (a, b) { return (b.at || '') < (a.at || '') ? -1 : (b.at || '') > (a.at || '') ? 1 : 0; });
     xStatus(x, ['tdnet', 'edinet', 'ir', 'gnews', 'kabutan'], document.getElementById('x-hold-status'));
     var ul = clear(document.getElementById('x-hold'));
-    hold.slice(0, 40).forEach(function (it) { ul.appendChild(xRow(it, shortName(it.code, it.name), md(it.at) + ' ' + hm(it.at))); });
+    hold.slice(0, 80).forEach(function (it) { ul.appendChild(xRow(it, shortName(it.code, it.name), md(it.at) + ' ' + hm(it.at))); });
     if (d.ir && d.ir.no_feed && d.ir.no_feed.length) {
       var p = el('p', 'note', 'IRのRSS配信が無い会社：' + d.ir.no_feed.map(function (n) { return shortName(n.code, n.name); }).join('、'));
       document.getElementById('x-hold-status').appendChild(p);
