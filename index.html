@@ -269,6 +269,19 @@
   .chart .end { font-weight: 600; }
   .breadth { display: flex; flex-wrap: wrap; gap: 16px; }
   .msg { padding: 12px 16px; border-radius: var(--r); border: 1px solid var(--line); background: var(--panel); }
+  .card-h { margin: 0 0 6px; font-size: 16px; }
+  .x-list { margin: 0; padding: 0; list-style: none; }
+  .x-list li { display: grid; grid-template-columns: auto auto 1fr auto; gap: 4px 8px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .x-list li:last-child { border-bottom: 0; }
+  .x-list .x-src { font-size: 11px; border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; color: var(--muted); white-space: nowrap; }
+  .x-list .x-code { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .x-list .x-title { min-width: 0; overflow-wrap: anywhere; }
+  .x-list .x-title a { color: inherit; }
+  .x-list .x-time { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .x-imp { color: var(--down); font-size: 11px; font-weight: 700; margin-right: 4px; }
+  .x-fail { color: var(--down); font-size: 13px; margin: 0; }
+  .x-status { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  @media (max-width: 520px) { .x-list li { grid-template-columns: auto 1fr auto; } .x-list .x-code { grid-column: 2; grid-row: 1; } .x-list .x-title { grid-column: 1 / -1; } }
   .msg.err { border-color: var(--down); }
   .lock p { margin: 0 0 10px; }
   .lock-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -415,6 +428,7 @@
   <nav class="toc" id="toc" aria-label="目次">
     <a href="#tiles">指数</a>
     <a href="#portfolio">ポートフォリオ</a>
+    <a href="#disclosures">開示</a>
     <a href="#movers">動きのいい銘柄</a>
     <a href="#news">ニュース</a>
     <a href="#futures">先物</a>
@@ -458,6 +472,27 @@
       <div id="finder-out" class="finder-out" aria-live="polite"></div>
       <div id="finder-recent" class="finder-recent"></div>
     </details>
+  </section>
+
+  <section class="section anchor" id="disclosures" hidden>
+    <h2>開示・ニュース</h2>
+    <div class="card">
+      <h3 class="card-h">保有銘柄の開示・ニュース</h3>
+      <p class="note">TDnet（適時開示）／EDINET／各社のIR／Googleニュースから、新しい順。<span class="x-imp">重要</span>は業績修正・配当・自社株買い・TOB・大量保有・M&amp;A・決算短信。</p>
+      <div id="x-hold-status"></div>
+      <ul class="x-list" id="x-hold"></ul>
+    </div>
+    <div class="card">
+      <h3 class="card-h">注目の開示（全銘柄の上方修正・増配・自社株買い・TOB）</h3>
+      <div id="x-hi-status"></div>
+      <ul class="x-list" id="x-hi"></ul>
+    </div>
+    <div class="card">
+      <h3 class="card-h">決算日・経済指標・権利日</h3>
+      <div id="x-cal-status"></div>
+      <ul class="x-list" id="x-cal"></ul>
+    </div>
+    <p class="note x-status" id="x-sources"></p>
   </section>
 
   <section class="section anchor" id="movers" hidden>
@@ -1537,6 +1572,68 @@
     renderFilters(); renderPortfolio();
   }
 
+
+  // ---- 段階2で足した情報源（extra.json） ----
+  function hm(isoStr) { var m = /T(\d\d):(\d\d)/.exec(isoStr || ''); return m ? (+m[1]) + ':' + m[2] : ''; }
+  function md(isoStr) { var m = /^\d{4}-(\d\d)-(\d\d)/.exec(isoStr || ''); return m ? (+m[1]) + '/' + (+m[2]) : ''; }
+  function xStatus(x, keys, box) {
+    clear(box);
+    keys.forEach(function (k) {
+      var st = x.sources && x.sources[k];
+      if (!st) { box.appendChild(el('p', 'x-fail', k + '：まだ取得していません')); return; }
+      if (st.ok === false) box.appendChild(el('p', 'x-fail', st.label + '：取得できませんでした（' + md(st.at) + ' ' + hm(st.at) + '）' + (st.error ? '　' + st.error : '')));
+    });
+  }
+  function xRow(it, codeText, timeText) {
+    var li = el('li');
+    li.appendChild(el('span', 'x-src', it.src));
+    li.appendChild(el('span', 'x-code', codeText || ''));
+    var t = el('span', 'x-title');
+    if (it.important) t.appendChild(el('span', 'x-imp', '重要'));
+    if (it.url) { var a = el('a', '', it.title); a.href = it.url; a.target = '_blank'; a.rel = 'noopener'; t.appendChild(a); } else t.appendChild(document.createTextNode(it.title));
+    if (it.site) t.appendChild(el('span', 'sub', '　' + it.site));
+    li.appendChild(t);
+    li.appendChild(el('span', 'x-time', timeText || ''));
+    return li;
+  }
+  function shortName(code, name) { return (name || '').replace(/（.*?）/g, '') || code; }
+  function renderExtra(x) {
+    var sec = document.getElementById('disclosures');
+    if (!x || !x.data) { sec.hidden = true; return; }
+    sec.hidden = false;
+    var d = x.data;
+    var hold = [];
+    ['tdnet', 'edinet', 'ir', 'gnews'].forEach(function (k) { if (d[k] && d[k].holdings) hold = hold.concat(d[k].holdings); });
+    hold.sort(function (a, b) { return (b.at || '') < (a.at || '') ? -1 : (b.at || '') > (a.at || '') ? 1 : 0; });
+    xStatus(x, ['tdnet', 'edinet', 'ir', 'gnews'], document.getElementById('x-hold-status'));
+    var ul = clear(document.getElementById('x-hold'));
+    hold.slice(0, 40).forEach(function (it) { ul.appendChild(xRow(it, shortName(it.code, it.name), md(it.at) + ' ' + hm(it.at))); });
+    if (d.ir && d.ir.no_feed && d.ir.no_feed.length) {
+      var p = el('p', 'note', 'IRのRSS配信が無い会社：' + d.ir.no_feed.map(function (n) { return shortName(n.code, n.name); }).join('、'));
+      document.getElementById('x-hold-status').appendChild(p);
+    }
+    xStatus(x, ['tdnet'], document.getElementById('x-hi-status'));
+    var hu = clear(document.getElementById('x-hi'));
+    ((d.tdnet && d.tdnet.highlights) || []).slice(0, 30).forEach(function (it) {
+      hu.appendChild(xRow({ src: it.kind, title: it.title, url: it.url }, it.name, md(it.at) + ' ' + hm(it.at)));
+    });
+    xStatus(x, ['jpx', 'macro', 'rights'], document.getElementById('x-cal-status'));
+    var cal = [];
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var todayIso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    ((d.jpx && d.jpx.earnings) || []).forEach(function (e) { if (e.date >= todayIso) cal.push({ date: e.date, src: '決算', title: shortName(e.code, e.name) + '　' + (e.period || '') + '決算発表' + (e.holding ? '（保有）' : ''), url: e.url }); });
+    ((d.macro && d.macro.events) || []).forEach(function (e) { if (e.date >= todayIso) cal.push({ date: e.date, time: e.time, src: e.kind, title: e.title, url: e.url }); });
+    ((d.rights && d.rights.items) || []).forEach(function (e) { cal.push({ date: e.date, src: '保有', title: shortName(e.code, e.name) + '　' + e.title + (e.approx ? '（目安）' : ''), url: e.url }); });
+    cal.sort(function (a, b) { return (a.date || '9999') < (b.date || '9999') ? -1 : (a.date || '9999') > (b.date || '9999') ? 1 : 0; });
+    var cu = clear(document.getElementById('x-cal'));
+    cal.slice(0, 40).forEach(function (e) { cu.appendChild(xRow({ src: e.src, title: e.title, url: e.url }, e.date ? md(e.date) : '日付未定', e.time || '')); });
+    var sb = clear(document.getElementById('x-sources'));
+    Object.keys(x.sources || {}).forEach(function (k) {
+      var st = x.sources[k];
+      sb.appendChild(el('span', st.ok ? '' : 'x-fail', st.label + ' ' + (st.ok ? md(st.at) + ' ' + hm(st.at) : '取得できませんでした（' + md(st.at) + ' ' + hm(st.at) + '）')));
+    });
+  }
+
   // 公開サイトのデータは暗号化してある（data/*.enc.json）。合い言葉はこの端末の中だけに覚える。
   var PASS_KEY = 'mk-pass', memPass = null;
   function readPass() {
@@ -1604,6 +1701,7 @@
     var err = document.getElementById('error');
     Promise.all([getJSON('data/market.json'), getJSON('data/watch.json')]).then(function (res) {
       state.market = res[0]; state.watch = res[1]; err.hidden = true; lock.hidden = true; render();
+      return getJSON('data/extra.json').then(function (x) { state.extra = x; renderExtra(x); }, function () { renderExtra(null); });
     }).catch(function (e) {
       if (e.lock) {
         err.hidden = true; lock.hidden = false;
