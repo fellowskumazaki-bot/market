@@ -478,12 +478,12 @@
     <h2>開示・ニュース</h2>
     <div class="card">
       <h3 class="card-h">保有銘柄の開示・ニュース</h3>
-      <p class="note">TDnet（適時開示）／EDINET／各社のIR／Googleニュースから、新しい順。<span class="x-imp">重要</span>は業績修正・配当・自社株買い・TOB・大量保有・M&amp;A・決算短信。</p>
+      <p class="note">TDnet（適時開示）／EDINET／各社のIR／Googleニュース／株探から、新しい順。<span class="x-imp">重要</span>は業績修正・配当・自社株買い・TOB・大量保有・M&amp;A・決算短信。</p>
       <div id="x-hold-status"></div>
       <ul class="x-list" id="x-hold"></ul>
     </div>
     <div class="card">
-      <h3 class="card-h">注目の開示（全銘柄の上方修正・増配・自社株買い・TOB）</h3>
+      <h3 class="card-h">注目の開示（全銘柄の上方修正・増配・自社株買い・TOB・大きな修正）</h3>
       <div id="x-hi-status"></div>
       <ul class="x-list" id="x-hi"></ul>
     </div>
@@ -1603,18 +1603,20 @@
     sec.hidden = false;
     var d = x.data;
     var hold = [];
-    ['tdnet', 'edinet', 'ir', 'gnews'].forEach(function (k) { if (d[k] && d[k].holdings) hold = hold.concat(d[k].holdings); });
+    ['tdnet', 'edinet', 'ir', 'gnews', 'kabutan'].forEach(function (k) { if (d[k] && d[k].holdings) hold = hold.concat(d[k].holdings); });
     hold.sort(function (a, b) { return (b.at || '') < (a.at || '') ? -1 : (b.at || '') > (a.at || '') ? 1 : 0; });
-    xStatus(x, ['tdnet', 'edinet', 'ir', 'gnews'], document.getElementById('x-hold-status'));
+    xStatus(x, ['tdnet', 'edinet', 'ir', 'gnews', 'kabutan'], document.getElementById('x-hold-status'));
     var ul = clear(document.getElementById('x-hold'));
     hold.slice(0, 40).forEach(function (it) { ul.appendChild(xRow(it, shortName(it.code, it.name), md(it.at) + ' ' + hm(it.at))); });
     if (d.ir && d.ir.no_feed && d.ir.no_feed.length) {
       var p = el('p', 'note', 'IRのRSS配信が無い会社：' + d.ir.no_feed.map(function (n) { return shortName(n.code, n.name); }).join('、'));
       document.getElementById('x-hold-status').appendChild(p);
     }
-    xStatus(x, ['tdnet'], document.getElementById('x-hi-status'));
+    xStatus(x, ['tdnet', 'kabutan'], document.getElementById('x-hi-status'));
     var hu = clear(document.getElementById('x-hi'));
-    ((d.tdnet && d.tdnet.highlights) || []).slice(0, 30).forEach(function (it) {
+    var his = ((d.tdnet && d.tdnet.highlights) || []).concat((d.kabutan && d.kabutan.revisions) || []);
+    his.sort(function (a, b) { return (b.at || '') < (a.at || '') ? -1 : (b.at || '') > (a.at || '') ? 1 : 0; });
+    his.slice(0, 40).forEach(function (it) {
       hu.appendChild(xRow({ src: it.kind, title: it.title, url: it.url }, it.name, md(it.at) + ' ' + hm(it.at)));
     });
     xStatus(x, ['jpx', 'macro', 'rights'], document.getElementById('x-cal-status'));
