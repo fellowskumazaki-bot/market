@@ -333,6 +333,22 @@
   .cmp-card dt { font-size: 11px; color: var(--muted); }
   .cmp-card dd { margin: 0; font-size: 14px; font-weight: 600; white-space: nowrap; }
   .cmp-card .nx { font-size: 12px; color: var(--muted); }
+  .lv { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; }
+  .lv-name { color: var(--muted); min-width: 5.5em; }
+  .lv-dots { display: inline-flex; gap: 3px; }
+  .lv-dots i { width: 14px; height: 8px; border-radius: 2px; background: var(--line); }
+  .lv-buy .lv-dots i.on { background: var(--up); }
+  .lv-sell .lv-dots i.on { background: var(--down); }
+  .lv-num { font-size: 13px; min-width: 1em; }
+  .lv-sm .lv-dots i { width: 9px; height: 6px; }
+  .lv-sm { display: flex; }
+  .lv-pair { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .lv-box { display: grid; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .lv-detail summary { cursor: pointer; font-size: 13px; color: var(--accent); }
+  .lv-parts { display: grid; gap: 4px; margin: 6px 0 0; }
+  .lv-parts div { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+  .lv-parts dt { color: var(--muted); }
+  .lv-parts dd { margin: 0; text-align: right; }
 
   /* ---- ニュースの出典まとめ ---- */
   .srcs { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: 12px; color: var(--muted); }
@@ -878,6 +894,57 @@
     var rows = histRows(w, code); if (rows.length < 2) return null;
     return ratio(rows[rows.length - 1].close, rows[0].close);
   }
+
+  // ---- 売り買いの強さ（勢いの表記。売買のすすめではない）----
+  // 直近20営業日の終値・出来高から、買いの強さ・売りの強さを別々に 0〜100 点で出し、5段階にする。
+  var STRENGTH = { days: 10, rsiDays: 14, maxGap: 10, rsiMax: 30 };
+  function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+  function strengthLevel(score) { return Math.min(5, Math.max(1, Math.ceil(score / 20) || 1)); }
+  function strength(w, r) {
+    var rows = histRows(w, r.code);
+    if (rows.length < STRENGTH.rsiDays + 1) return null;
+    var closes = rows.map(function (x) { return x.close; });
+    var last = closes[closes.length - 1];
+    // 1) 上げた日・下げた日の数（直近10日）
+    var up = 0, down = 0, upVol = 0, downVol = 0, n = 0;
+    for (var i = closes.length - STRENGTH.days; i < closes.length; i++) {
+      if (i < 1) continue; n++;
+      var d = closes[i] - closes[i - 1], v = rows[i].volume || 0;
+      if (d > 0) { up++; upVol += v; } else if (d < 0) { down++; downVol += v; }
+    }
+    // 2) 出来高の偏り（上げた日・下げた日の出来高の割合）
+    var volSum = upVol + downVol, upShare = volSum ? upVol / volSum : 0.5;
+    // 3) 20日平均との差
+    var avg = closes.reduce(function (a, b) { return a + b; }, 0) / closes.length;
+    var gap = (last - avg) / avg * 100;
+    // 4) RSI（14日）
+    var g = 0, l = 0;
+    for (var j = closes.length - STRENGTH.rsiDays; j < closes.length; j++) { var dd = closes[j] - closes[j - 1]; if (dd > 0) g += dd; else l -= dd; }
+    var rsi = g + l ? g / (g + l) * 100 : 50;
+    var parts = [
+      { label: '上げた日・下げた日（直近' + n + '日）', text: '上げ ' + up + '日／下げ ' + down + '日', buy: n ? up / n : 0, sell: n ? down / n : 0 },
+      { label: '出来高の偏り（直近' + n + '日）', text: volSum ? '上げた日 ' + Math.round(upShare * 100) + '%／下げた日 ' + Math.round((1 - upShare) * 100) + '%' : '—', buy: upShare, sell: 1 - upShare },
+      { label: '20日平均との差', text: (gap >= 0 ? '+' : '') + gap.toFixed(1) + '%', buy: clamp01(gap / STRENGTH.maxGap), sell: clamp01(-gap / STRENGTH.maxGap) },
+      { label: 'RSI（14日）', text: Math.round(rsi) + '', buy: clamp01((rsi - 50) / STRENGTH.rsiMax), sell: clamp01((50 - rsi) / STRENGTH.rsiMax) }
+    ];
+    if (r.individual === '買い' || r.individual === '売り') {
+      parts.push({ label: 'みんかぶの個人予想', text: r.individual + 'が多い', buy: r.individual === '買い' ? 1 : 0, sell: r.individual === '売り' ? 1 : 0 });
+    }
+    var bs = parts.reduce(function (a, p) { return a + p.buy; }, 0) / parts.length * 100;
+    var ss = parts.reduce(function (a, p) { return a + p.sell; }, 0) / parts.length * 100;
+    return { buy: Math.round(bs), sell: Math.round(ss), buyLv: strengthLevel(bs), sellLv: strengthLevel(ss), parts: parts };
+  }
+  function lvMeter(kind, lv, compact) {
+    var wrap = el('span', 'lv lv-' + kind + (compact ? ' lv-sm' : ''));
+    wrap.setAttribute('aria-label', (kind === 'buy' ? '買いの強さ ' : '売りの強さ ') + lv + '（5段階）');
+    if (!compact) wrap.appendChild(el('span', 'lv-name', kind === 'buy' ? '買いの強さ' : '売りの強さ'));
+    var dots = el('span', 'lv-dots');
+    for (var k = 1; k <= 5; k++) dots.appendChild(el('i', k <= lv ? 'on' : ''));
+    wrap.appendChild(dots);
+    wrap.appendChild(el('b', 'lv-num', String(lv)));
+    return wrap;
+  }
+  var STRENGTH_NOTE = '勢いの表記で、売買のすすめではありません。直近20営業日の値動きと出来高から計算しています。';
   function drawHist(box, rows) {
     var NS = 'http://www.w3.org/2000/svg';
     var W = Math.max(280, box.clientWidth || 600), H = 190, L = 8, R = 64, T = 14, B = 26;
@@ -1101,7 +1168,7 @@
       var sc = el('div', 'scroll cmp-table'); var t2 = el('table'); sc.appendChild(t2); c2.appendChild(sc);
       var cols = [['銘柄'], ['株価', 'r'], ['騰落率', 'r'], ['夜間PTS', 'r'], ['1か月', 'r']];
       if (anyHold) cols = cols.concat([['評価額', 'r'], ['含み損益', 'r']]);
-      cols = cols.concat([['高値から', 'r'], ['目標まで', 'r'], ['配当利回り', 'r'], ['PER', 'r'], ['PBR', 'r'], ['次の予定']]);
+      cols = cols.concat([['買い／売りの強さ'], ['高値から', 'r'], ['目標まで', 'r'], ['配当利回り', 'r'], ['PER', 'r'], ['PBR', 'r'], ['次の予定']]);
       var hr = el('tr'); cols.forEach(function (c) { hr.appendChild(el('th', c[1] || '', c[0])); });
       var th = el('thead'); th.appendChild(hr); t2.appendChild(th);
       var tb = el('tbody');
@@ -1114,6 +1181,7 @@
       });
       t2.appendChild(tb);
       c2.appendChild(cards);
+      c2.appendChild(el('p', 'note', '「買い／売りの強さ」は' + STRENGTH_NOTE + '銘柄を押すと内訳が見られます。'));
       box.appendChild(c2);
       return;
       function cmpRow(r) {
@@ -1124,11 +1192,15 @@
         var m1 = monthChange(w, r.code);
         var cells = [[shortName(r.name)], [num(r.price), 'r'], [pct(r.pct), 'r', r.pct], [pct(r.pts_pct), 'r', r.pts_pct], [m1 === null ? '—' : pct(m1), 'r', m1]];
         if (anyHold) cells = cells.concat([[h ? yenPlain(h.value) : '—', 'r'], [h ? yen(h.pl) + '（' + pct(h.plPct) + '）' : '—', 'r', h ? h.pl : null]]);
-        cells = cells.concat([[fromHigh === null ? '—' : pct(fromHigh), 'r', fromHigh],
+        var stIdx = cells.length;
+        cells = cells.concat([['', 'lv-cell'], [fromHigh === null ? '—' : pct(fromHigh), 'r', fromHigh],
           [toTarget === null ? '—' : pct(toTarget), 'r', toTarget], [r.yield == null ? '—' : num(r.yield) + '%', 'r'], [r.per == null ? '—' : num(r.per) + '倍', 'r'],
           [r.pbr == null ? '—' : num(r.pbr) + '倍', 'r'], [r.next_event || '—', 'dim']]);
         cells.forEach(function (c) { var td = el('td', c[1] || '', c[0]); if (c.length > 2) tone(td, c[2]); tr.appendChild(td); });
         var sp1 = spark(histRows(w, r.code).map(function (x) { return x.close; }), 'spark-sm'); if (sp1) tr.children[1].appendChild(sp1);
+        var st1 = strength(w, r), stTd = tr.children[stIdx];
+        if (st1) { stTd.appendChild(lvMeter('buy', st1.buyLv, true)); stTd.appendChild(lvMeter('sell', st1.sellLv, true)); stTd.title = '買い ' + st1.buy + '点／売り ' + st1.sell + '点'; }
+        else stTd.textContent = '—';
         return tr;
       }
       function cmpCard(r) {
@@ -1145,6 +1217,8 @@
         if (h) items = [['評価額', yenPlain(h.value), null], ['含み損益', yen(h.pl), h.pl], ['今日', yen(h.today), h.today]].concat(items);
         items.forEach(function (x) { var d = el('div'); d.appendChild(el('dt', '', x[0])); d.appendChild(tone(el('dd', '', x[1]), x[2])); dl.appendChild(d); });
         b.appendChild(dl);
+        var st2 = strength(w, r);
+        if (st2) { var lvb = el('span', 'lv-pair'); lvb.appendChild(lvMeter('buy', st2.buyLv)); lvb.appendChild(lvMeter('sell', st2.sellLv)); b.appendChild(lvb); }
         if (r.next_event) b.appendChild(el('span', 'nx', '次の予定：' + r.next_event));
         return b;
       }
@@ -1209,6 +1283,20 @@
     if (imp) chip('重要ニュース ' + imp + '件', null, false);
     if (r.next_event) chip(r.next_event, null, null);
     hero.appendChild(chips);
+    var st3 = strength(w, r);
+    if (st3) {
+      var sb = el('div', 'lv-box');
+      var sp = el('div', 'lv-pair'); sp.appendChild(lvMeter('buy', st3.buyLv)); sp.appendChild(lvMeter('sell', st3.sellLv)); sb.appendChild(sp);
+      var det = el('details', 'lv-detail'); det.appendChild(el('summary', '', '内訳を見る（買い ' + st3.buy + '点／売り ' + st3.sell + '点）'));
+      var dl3 = el('dl', 'lv-parts');
+      st3.parts.forEach(function (p) {
+        var d = el('div'); d.appendChild(el('dt', '', p.label));
+        d.appendChild(el('dd', '', p.text + '（買い ' + Math.round(p.buy * 100) + '／売り ' + Math.round(p.sell * 100) + '）')); dl3.appendChild(d);
+      });
+      det.appendChild(dl3); sb.appendChild(det);
+      sb.appendChild(el('p', 'note', STRENGTH_NOTE));
+      hero.appendChild(sb);
+    }
     box.appendChild(hero);
 
     // 2) タブ：分析／ニュース／会社情報
